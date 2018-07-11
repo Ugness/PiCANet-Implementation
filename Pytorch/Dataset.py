@@ -70,6 +70,8 @@ class DUTS_dataset(data.Dataset):
         mask_name = '{}/DUTS-{}-Mask/{}'.format(self.root_dir, 'TR' if self.train else 'TE', self.mask_list[item])
         img = Image.open(img_name)
         mask = Image.open(mask_name)
+        img = img.convert('RGB')
+        mask = mask.convert('L')
         sample = {'image': img, 'mask': mask}
 
         if self.data_augmentation:

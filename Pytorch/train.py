@@ -7,7 +7,6 @@ from tensorboardX import SummaryWriter
 import datetime
 import os
 
-
 cfg = {'PicaNet': "GGLLL",
        'Size': [28, 28, 28, 56, 112, 224],
        'Channel': [1024, 512, 512, 256, 128, 64],
@@ -34,10 +33,11 @@ if __name__ == '__main__':
     decay_step = 7000
     opt_en = torch.optim.SGD(model.encoder.parameters(), lr=learning_rate, momentum=0.9, weight_decay=0.0005)
     opt_dec = torch.optim.SGD(model.decoder.parameters(), lr=learning_rate * 10, momentum=0.9, weight_decay=0.0005)
-    dataloader = DataLoader(dataset, batch_size)
+    dataloader = DataLoader(dataset, batch_size, num_workers=0)
     now = datetime.datetime.now()
     os.makedirs('log/{}'.format(now.strftime('%m%d%H%M')), exist_ok=True)
     writer = SummaryWriter('log/{}'.format(now.strftime('%m%d%H%M')))
+    # print(len(dataloader))
     for epo in range(epoch):
         for i, batch in enumerate(dataloader):
             # print(batch['image'].size())
@@ -49,11 +49,18 @@ if __name__ == '__main__':
             loss.backward()
             opt_dec.step()
             opt_en.step()
-            writer.add_scalar('loss', float(loss), global_step= i + epo*len(dataloader))
+            writer.add_scalar('loss', float(loss), global_step=i + epo * len(dataloader))
             if i % 10 == 0:
                 for masked in pred:
                     writer.add_image('{}'.format(masked.size()[2]), masked, i)
                 writer.add_image('target', img, i)
-            if i % 1000 == 0:
+            if i % 1000 == 0 and i != 0:
                 os.makedirs('models/{}'.format(now.strftime('%m%d%H%M')), exist_ok=True)
                 torch.save(model, 'models/{}/{}epo_{}step.ckpt'.format(now.strftime('%m%d%H%M'), epo, i))
+            if i + epo * len(dataloader) % decay_step == 0 and i != 0:
+                learning_rate *= lr_decay
+                opt_en = torch.optim.SGD(model.encoder.parameters(), lr=learning_rate, momentum=0.9,
+                                         weight_decay=0.0005)
+                opt_dec = torch.optim.SGD(model.decoder.parameters(), lr=learning_rate * 10, momentum=0.9,
+                                          weight_decay=0.0005)
+            del loss
