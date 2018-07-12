@@ -21,7 +21,7 @@ if __name__ == '__main__':
     epoch = 20
     dataset = DUTS_dataset('../DUTS-TR')
     # load = None
-    load = 'models/07121619/0epo_10200step.ckpt'
+    load = 'models/07121619/0epo_10400step.ckpt'
     start_iter = 0
     # noise = torch.randn((batch_size, 3, 224, 224)).type(torch.cuda.FloatTensor)
     # target = torch.randn((batch_size, 1, 224, 224)).type(torch.cuda.FloatTensor)
@@ -60,6 +60,7 @@ if __name__ == '__main__':
     os.makedirs('log/{}'.format(now.strftime('%m%d%H%M')), exist_ok=True)
     writer = SummaryWriter('log/{}'.format(now.strftime('%m%d%H%M')))
     # print(len(dataloader))
+    iterate = start_iter
     for epo in range(epoch):
         for i, batch in enumerate(islice(dataloader, start_iter, None)):
             # print(batch['image'].size())
@@ -72,7 +73,6 @@ if __name__ == '__main__':
             torch.nn.utils.clip_grad_norm_(model.parameters(), 100)
             opt_dec.step()
             opt_en.step()
-            iterate = i + start_iter + epo * len(dataloader)
             writer.add_scalar('loss', float(loss), global_step=iterate)
             # print(iterate)
             if iterate % 10 == 0:
@@ -97,5 +97,6 @@ if __name__ == '__main__':
                                           weight_decay=0.0005)
                 # opt_en = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate, weight_decay=0.0005)
                 # opt_dec = torch.optim.Adam(model.decoder.parameters(), lr=learning_rate * 10, weight_decay=0.0005)
-
+            iterate += 1
             del loss
+        start_iter = 0
