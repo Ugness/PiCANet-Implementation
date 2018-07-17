@@ -7,6 +7,7 @@ from tensorboardX import SummaryWriter
 import datetime
 import os
 from itertools import islice
+import numpy as np
 
 cfg = {'PicaNet': "GGLLL",
        'Size': [28, 28, 28, 56, 112, 224],
@@ -18,10 +19,10 @@ if __name__ == '__main__':
     torch.manual_seed(1234)
     device = torch.device("cuda")
     batch_size = 1
-    epoch = 20
+    epoch = 200
     dataset = DUTS_dataset('../DUTS-TR')
     # load = None
-    load = 'models/07121619/0epo_10400step.ckpt'
+    load = 'models/07121619/23epo_195600step.ckpt'
     start_iter = 0
     # noise = torch.randn((batch_size, 3, 224, 224)).type(torch.cuda.FloatTensor)
     # target = torch.randn((batch_size, 1, 224, 224)).type(torch.cuda.FloatTensor)
@@ -35,10 +36,12 @@ if __name__ == '__main__':
         vgg = torchvision.models.vgg16(pretrained=True)
         model.encoder.seq.load_state_dict(vgg.features.state_dict())
         now = datetime.datetime.now()
+        start_epo = 0
         del vgg
     else:
         model = torch.load(load)
         start_iter = int(load.split('_')[1].strip('step.ckpt')) + 1
+        start_epo = int(load.split('/')[2].split('epo')[0])
         now = datetime.datetime.strptime(load.split('/')[1], '%m%d%H%M')
         print("Loading Model from {}".format(load))
         print("Start_iter : {}".format(start_iter))
@@ -50,8 +53,9 @@ if __name__ == '__main__':
         print('Loading_Complete')
     learning_rate = 0.001
     lr_decay = 0.1
-    learning_rate = learning_rate * (lr_decay ** (start_iter // 7000))
-    decay_step = 7000
+    # decay_step = 7000
+    decay_step = 20000  # from 50000 step
+    learning_rate = learning_rate * (lr_decay ** (start_iter // decay_step))
     opt_en = torch.optim.SGD(model.encoder.parameters(), lr=learning_rate, momentum=0.9, weight_decay=0.0005)
     opt_dec = torch.optim.SGD(model.decoder.parameters(), lr=learning_rate * 10, momentum=0.9, weight_decay=0.0005)
     # opt_en = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate, weight_decay=0.0005)
@@ -61,7 +65,7 @@ if __name__ == '__main__':
     writer = SummaryWriter('log/{}'.format(now.strftime('%m%d%H%M')))
     # print(len(dataloader))
     iterate = start_iter
-    for epo in range(epoch):
+    for epo in range(start_epo, epoch):
         for i, batch in enumerate(islice(dataloader, start_iter, None)):
             # print(batch['image'].size())
             opt_dec.zero_grad()
@@ -81,9 +85,13 @@ if __name__ == '__main__':
                 writer.add_image('GT', mask, iterate)
                 writer.add_image('Image', img, iterate)
 
-            if iterate % 200 == 0 and i != 0:
-                os.makedirs('models/{}'.format(now.strftime('%m%d%H%M')), exist_ok=True)
-                torch.save(model, 'models/{}/{}epo_{}step.ckpt'.format(now.strftime('%m%d%H%M'), epo, iterate))
+            if iterate % 200 == 0:
+                if i != 0:
+                    os.makedirs('models/{}'.format(now.strftime('%m%d%H%M')), exist_ok=True)
+                    torch.save(model, 'models/{}/{}epo_{}step.ckpt'.format(now.strftime('%m%d%H%M'), epo, iterate))
+                    print('models/{}/{}epo_{}step.ckpt'.format(now.strftime('%m%d%H%M'), epo, iterate))
+                # for name, param in model.named_parameters():
+                #     writer.add_histogram(name, param, iterate, bins=np.arange(-0.003, 0.003, 0.0001))
             if iterate % 1000 == 0 and i != 0:
                 check = os.listdir('models/{}'.format(now.strftime('%m%d%H%M')))
                 for file in check:
