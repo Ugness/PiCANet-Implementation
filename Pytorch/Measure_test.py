@@ -16,9 +16,9 @@ if __name__ == '__main__':
     device = torch.device("cuda")
     writer = SummaryWriter('log/test')
     for model_name in models:
-        # if int(model_name.split('epo_')[1].split('step')[0]) < 214000:
-        #     continue
-        if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
+        if int(model_name.split('epo_')[1].split('step')[0]) < 17000:
+            continue
+        if int(model_name.split('epo_')[1].split('step')[0]) % 10000 != 0:
             continue
         model = torch.load('models/07121619/' + model_name).to(device)
         model.eval()
