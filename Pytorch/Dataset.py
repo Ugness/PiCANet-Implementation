@@ -6,6 +6,14 @@ import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
 
+class Resize(object):
+    def __init__(self, size):
+        self.size = size
+
+    def __call__(self, sample):
+        img, mask = sample['image'], sample['mask']
+        img, mask = img.resize((self.size, self.size), resample=Image.BILINEAR), mask.resize((self.size, self.size), resample=Image.BILINEAR)
+        return {'image': img, 'mask': mask}
 
 class RandomCrop(object):
     def __init__(self, size):
@@ -58,6 +66,8 @@ class DUTS_dataset(data.Dataset):
             [RandomFlip(0.5),
              RandomCrop(224),
              ToTensor()])
+        if not train:
+            self.transform = transforms.Compose([Resize(224), ToTensor()])
         self.root_dir = root_dir
         self.train = train
         self.data_augmentation = data_augmentation
