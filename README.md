@@ -5,4 +5,8 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ![target_image](/mask.png)
 
 * You can execute train.py by Download DUTS Dataset and modify the _root_dir_ argument in DUTS_Dataset(), train.py
-* I will make some parse options as soon as possible
+# Execution Guideline
+
+"""
+python train.py -h
+"""
