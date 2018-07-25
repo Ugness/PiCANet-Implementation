@@ -32,8 +32,18 @@ class Unet(nn.Module):
                                         mode='C').cuda())
 
     def forward(self, *input):
-        x = input[0]
-        tar = input[1]
+        if len(input) == 2:
+            x = input[0]
+            tar = input[1]
+            test_mode = False
+        if len(input) == 3:
+            x = input[0]
+            tar = input[1]
+            test_mode = input[2]
+        if len(input) == 1:
+            x = input[0]
+            tar = None
+            test_mode = True
         En_out = self.encoder(x)
         Dec = None
         pred = []
@@ -42,11 +52,12 @@ class Unet(nn.Module):
             Dec, _pred = self.decoder[i](En_out[5 - i], Dec)
             pred.append(_pred)
         loss = 0
-        for i in range(6):
-            loss += F.binary_cross_entropy(pred[5 - i], tar) * self.cfg['loss_ratio'][5 - i]
-            # print(float(loss))
-            if tar.size()[2] > 28:
-                tar = F.max_pool2d(tar, 2, 2)
+        if not test_mode:
+            for i in range(6):
+                loss += F.binary_cross_entropy(pred[5 - i], tar) * self.cfg['loss_ratio'][5 - i]
+                # print(float(loss))
+                if tar.size()[2] > 28:
+                    tar = F.max_pool2d(tar, 2, 2)
         return pred, loss
 
 

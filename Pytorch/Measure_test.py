@@ -14,15 +14,16 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, 4, shuffle=False)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/test')
+    writer = SummaryWriter('log/test2')
     for model_name in models:
-        if int(model_name.split('epo_')[1].split('step')[0]) < 17000:
+        if int(model_name.split('epo_')[1].split('step')[0]) < 180000:
             continue
         if int(model_name.split('epo_')[1].split('step')[0]) % 10000 != 0:
             continue
         model = torch.load('models/07121619/' + model_name).to(device)
         model.eval()
         avg_precision, avg_recall, avg_fscore = [], [], []
+        tp, tn, fp, fn = 0, 0, 0, 0
         for i, batch in enumerate(dataloader):
             img = batch['image'].to(device)
             mask = batch['mask'].to(device)
@@ -36,33 +37,24 @@ if __name__ == '__main__':
             f = 1 - mask.type(torch.cuda.FloatTensor)
             n = 1 - pred.type(torch.cuda.FloatTensor)
             # based on http://blog.acronym.co.kr/556
-            tp = torch.sum(t * p)
-            tn = torch.sum(f * n)
-            fp = torch.sum(f * p)
-            fn = torch.sum(t * n)
-            precision = tp / (tp + fp)
-            recall = tp / (tp + fn)
-            fscore = (1 + beta_square) * precision * recall / (beta_square * precision + recall)
-            # precision, recall, fscore, _ = \
-            #     precision_recall_fscore_support(mask.data.cpu().numpy(), pred.data.cpu().numpy(), average='binary')
-            avg_precision.append(float(precision))
-            avg_recall.append(float(recall))
-            avg_fscore.append(float(fscore))
+            tp += float(torch.sum(t * p))
+            tn += float(torch.sum(f * n))
+            fp += float(torch.sum(f * p))
+            fn += float(torch.sum(t * n))
             if i % 100 == 0:
-                print(model_name, i,
-                      sum(avg_precision) / float(len(avg_precision)),
-                      sum(avg_recall) / float(len(avg_recall)),
-                      sum(avg_fscore) / float(len(avg_fscore)))
-        avg_precision = sum(avg_precision) / float(len(avg_precision))
-        avg_recall = sum(avg_recall) / float(len(avg_recall))
-        avg_fscore = sum(avg_fscore) / float(len(avg_fscore))
-        writer.add_scalar('precision', avg_precision, global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar('recall', avg_recall, global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar('F_score', avg_fscore, global_step=int(model_name.split('epo_')[1].split('step')[0]))
+                print('Model: '+model_name)
+                print('i: ', i)
+                print('tp: '+str(tp))
+                print('tn: '+str(tn))
+                print('fp: '+str(fp))
+                print('fn: '+str(fn))
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+        fscore = (1 + beta_square) * precision * recall / (beta_square * precision + recall)
+        writer.add_scalar('precision', precision, global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar('recall', recall, global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar('F_score', fscore, global_step=int(model_name.split('epo_')[1].split('step')[0]))
         print('Model : ' + model_name)
-        print('Precision : ' + str(avg_precision))
-        print('Recall : ' + str(avg_recall))
-        print('F_score : ' + str(avg_fscore))
-        print('F_score : ' + str(
-            (1 + beta_square) * avg_precision * avg_recall / (beta_square * avg_precision + avg_recall)))
-        avg_precision, avg_recall, avg_fscore = [], [], []
+        print('Precision : ' + str(precision))
+        print('Recall : ' + str(recall))
+        print('F_score : ' + str(fscore))

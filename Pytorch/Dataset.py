@@ -66,7 +66,7 @@ class DUTS_dataset(data.Dataset):
             [RandomFlip(0.5),
              RandomCrop(224),
              ToTensor()])
-        if not train:
+        if not (train and data_augmentation):
             self.transform = transforms.Compose([Resize(224), ToTensor()])
         self.root_dir = root_dir
         self.train = train
@@ -84,8 +84,24 @@ class DUTS_dataset(data.Dataset):
         mask = mask.convert('L')
         sample = {'image': img, 'mask': mask}
 
-        if self.data_augmentation:
-            sample = self.transform(sample)
+        # if self.data_augmentation:
+        sample = self.transform(sample)
+        return sample
+
+class Custom_dataset(data.Dataset):
+    def __init__(self, root_dir):
+        self.image_list = sorted(os.listdir(root_dir))
+        self.transform = transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor()])
+        self.root_dir = root_dir
+
+    def __len__(self):
+        return len(self.image_list)
+
+    def __getitem__(self, item):
+        img_name = '{}/{}'.format(self.root_dir, self.image_list[item])
+        img = Image.open(img_name)
+        sample = img.convert('RGB')
+        sample = self.transform(sample)
         return sample
 
 
