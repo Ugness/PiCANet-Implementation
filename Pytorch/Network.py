@@ -14,7 +14,10 @@ cfg = {'PicaNet': "GGLLL",
 
 
 class Unet(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, cfg={'PicaNet': "GGLLL",
+       'Size': [28, 28, 28, 56, 112, 224],
+       'Channel': [1024, 512, 512, 256, 128, 64],
+       'loss_ratio': [0.5, 0.5, 0.5, 0.8, 0.8, 1]}):
         super(Unet, self).__init__()
         self.encoder = Encoder()
         self.decoder = nn.ModuleList()

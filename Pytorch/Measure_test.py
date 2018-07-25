@@ -1,6 +1,6 @@
 # from sklearn.metrics import precision_recall_fscore_support
-from Pytorch.Network import Unet
-from Pytorch.Dataset import DUTS_dataset
+from Network import Unet
+from Dataset import DUTS_dataset
 import torch
 import os
 import numpy as np
@@ -20,6 +20,7 @@ if __name__ == '__main__':
             continue
         if int(model_name.split('epo_')[1].split('step')[0]) % 10000 != 0:
             continue
+
         model = torch.load('models/07121619/' + model_name).to(device)
         model.eval()
         avg_precision, avg_recall, avg_fscore = [], [], []
