@@ -19,9 +19,9 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
     -h, --help            show this help message and exit
     --load LOAD           Directory of pre-trained model, you can download at 
                         https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1
-                        A6xLzf8Na/view?usp=sharingNone --> Do not use pre-
-                        trained model. Training will start from random
-                        initialized model
+                        A6xLzf8Na/view?usp=sharing
+                        None --> Do not use pre-trained model. 
+                        Training will start from random initialized model
     --dataset DATASET     Directory of your DUTS dataset "folder"
     --cuda CUDA           'cuda' for cuda, 'cpu' for cpu, default = cuda
     --batch_size BATCH_SIZE
@@ -29,11 +29,9 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
     --epoch EPOCH         # of epochs. default = 20
     -lr LEARNING_RATE, --learning_rate LEARNING_RATE
                         learning_rate. default = 0.001
-    --lr_decay LR_DECAY   Learning rate decrease by lr_decay time per
-                        decay_step, default = 0.1
+    --lr_decay LR_DECAY   Learning rate decrease by lr_decay time per decay_step, default = 0.1
     --decay_step DECAY_STEP
-                        Learning rate decrease by lr_decay time per
-                        decay_step, default = 7000
+                        Learning rate decrease by lr_decay time per decay_step, default = 7000
 </pre>
 
 <code>
