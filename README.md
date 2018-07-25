@@ -76,8 +76,8 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 * Log files will saved in log/Image_test
 
 * You can see the images by execute
-<code>
+    ```
     tensorboard --logdir=./log/Image_test
-</code>
+    ```
 
-and browse 127.0.0.1:6006 with your browser(ex. Chrome, IE, etc)
+    and browse 127.0.0.1:6006 with your browser(ex. Chrome, IE, etc)
