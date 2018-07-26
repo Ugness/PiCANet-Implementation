@@ -6,6 +6,24 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 
 * You can execute train.py by Download DUTS Dataset and modify the _root_dir_ argument in DUTS_Dataset(), train.py
 # Execution Guideline
+## Requirements
+Pillow==4.3.0  
+pytorch==0.4.0  
+tensorboardX==1.1  
+torchvision==0.2.1  
+numpy==1.14.2  
+
+## My Environment
+S/W  
+Windows 10  
+CUDA 9.0  
+cudnn 7.0  
+python 3.5  
+H/W  
+AMD Ryzen 1700
+Nvidia gtx 1080ti  
+32GB RAM
+
 ## You can run the file by following the descriptions in -h option.
 <code>
     python train.py -h
@@ -54,6 +72,31 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 </pre>
 
 ## Detailed Guideline
+### Pretrained Model
+You can download pre-trained models from https://drive.google.com/drive/folders/1s4M-_SnCPMj_2rsMkSy3pLnLQcgRakAe?usp=sharing  
+### Dataset
+I used DUTS dataset as Training dataset and Test dataset.  
+You can download dataset from http://saliencydetection.net/duts/#outline-container-orgab269ec.
+* Caution: You should check the dataset's Image and GT are matched or not. (ex. # of images, name, ...)
+
+### Execution Example
+Assume you train the model with  
+* current dir: Pytorch/  
+* Dataset dir: Pytorch/DUTS-TE  
+* Pretrained model dir: Pytorch/models/state_dict/07261950/10epo_1000000step.ckpt  
+* Goal Epoch : 100  
+<code>
+    python train.py --load models/state_dict/07261950/10epo_1000000step.ckpt --dataset DUTS-TE --epoch 100
+</code>
+
+Assume you test the model with  
+* current dir: Pytorch/  
+* Testset dir: Pytorch/test  
+* Pretrained model dir: Pytorch/models/state_dict/07261950/10epo_1000000step.ckpt  
+* CPU mode  
+<code>
+    python Image_test.py --model_dir models/state_dict/07261950/10epo_1000000step.ckpt --img test --cuda cpu
+</code>
 
 ### Directory & Name Format of .ckpt files
 <code>
