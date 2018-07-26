@@ -4,8 +4,6 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ![input image](/input.png)
 ![target_image](/mask.png)
 
-* You can execute train.py by Download DUTS Dataset and modify the _root_dir_ argument in DUTS_Dataset(), train.py
-
 # Performance Test with F-score (beta-square = 0.3)  
 <center>
     <table>
