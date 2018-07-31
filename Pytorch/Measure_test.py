@@ -9,19 +9,21 @@ from tensorboardX import SummaryWriter
 
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
-    models = sorted(os.listdir('models/07121619'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
+    models = sorted(os.listdir('models/state_dict/07121619'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
     dataset = DUTS_dataset(root_dir='../DUTS-TE', train=False)
     dataloader = DataLoader(dataset, 4, shuffle=False)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/test2')
+    writer = SummaryWriter('log/test2_X_round')
+    model = Unet().to(device)
     for model_name in models:
-        if int(model_name.split('epo_')[1].split('step')[0]) < 180000:
-            continue
+        # if int(model_name.split('epo_')[1].split('step')[0]) < 259000:
+        #     continue
         if int(model_name.split('epo_')[1].split('step')[0]) % 10000 != 0:
             continue
 
-        model = torch.load('models/07121619/' + model_name).to(device)
+        state_dict = torch.load('models/state_dict/07121619/' + model_name)
+        model.load_state_dict(state_dict)
         model.eval()
         avg_precision, avg_recall, avg_fscore = [], [], []
         tp, tn, fp, fn = 0, 0, 0, 0
@@ -32,7 +34,7 @@ if __name__ == '__main__':
                 pred, loss = model(img, mask)
             pred = pred[5].data
             pred = pred.requires_grad_(False)
-            pred = torch.round(pred).data
+            # pred = torch.round(pred).data
             t = mask.type(torch.cuda.FloatTensor)
             p = pred.type(torch.cuda.FloatTensor)
             f = 1 - mask.type(torch.cuda.FloatTensor)

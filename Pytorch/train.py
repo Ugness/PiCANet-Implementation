@@ -19,11 +19,11 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(1234)
     torch.manual_seed(1234)
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     print("Default path : "+os.getcwd())
     parser.add_argument("--load",
-                        help="Directory of pre-trained model, you can download at "
-                             "https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1A6xLzf8Na/view?usp=sharing"
+                        help="Directory of pre-trained model, you can download at \n"
+                             "https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1A6xLzf8Na/view?usp=sharing\n"
                              "None --> Do not use pre-trained model. Training will start from random initialized model")
     parser.add_argument('--dataset', help='Directory of your DUTS dataset "folder"', default='../DUTS-TR')
     parser.add_argument('--cuda', help="'cuda' for cuda, 'cpu' for cpu, default = cuda", default='cuda')
@@ -61,8 +61,8 @@ if __name__ == '__main__':
 
         start_iter = int(load.split('epo_')[1].strip('step.ckpt')) + 1
         start_epo = int(load.split('/')[3].split('epo')[0])
-
         now = datetime.datetime.strptime(load.split('/')[2], '%m%d%H%M')
+
         print("Loading Model from {}".format(load))
         print("Start_iter : {}".format(start_iter))
         print("now : {}".format(now.strftime('%m%d%H%M')))

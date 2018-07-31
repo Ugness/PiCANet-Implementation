@@ -1,4 +1,3 @@
-# from sklearn.metrics import precision_recall_fscore_support
 from Network import Unet
 from Dataset import Custom_dataset
 import torch
@@ -11,10 +10,10 @@ import argparse
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     print("Default path : " + os.getcwd())
     parser.add_argument("--model_dir",
-                        help="Directory of pre-trained model, you can download at "
+                        help="Directory of pre-trained model, you can download at \n"
                              "https://drive.google.com/drive/folders/1s4M-_SnCPMj_2rsMkSy3pLnLQcgRakAe?usp=sharing")
     parser.add_argument('-img', '--image_dir', help='Directory of your test_image ""folder""')
     parser.add_argument('--cuda', help="'cuda' for cuda, 'cpu' for cpu, default = cuda", default='cuda')
@@ -38,7 +37,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             pred, loss = model(img)
         pred = pred[5].data
-        pred = pred.requires_grad_(False)
+        pred.requires_grad_(False)
         writer.add_image(args.model_dir + ', img', img, i)
         writer.add_image(args.model_dir + ', mask', pred, i)
     writer.close()
