@@ -4,95 +4,19 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ![input image](/input.png)
 ![target_image](/mask.png)
 
-# Performance Test with F-score (beta-square = 0.3)  
-<center>
-    <table>
-      <tr>
-        <th>Step</th>
-        <th>Value</th>
-      </tr>
-      <tr>
-        <td>10000</td>
-        <td>0.710664332</td>
-      </tr>
-      <tr>
-        <td>20000</td>
-        <td>0.754679859</td>
-      </tr>
-      <tr>
-        <td>30000</td>
-        <td>0.742791772</td>
-      </tr>
-      <tr>
-        <td>40000</td>
-        <td>0.769039154</td>
-      </tr>
-      <tr>
-        <td>50000</td>
-        <td>0.77366817</td>
-      </tr>
-      <tr>
-        <td>60000</td>
-        <td>0.771476448</td>
-      </tr>
-      <tr>
-        <td>70000</td>
-        <td>0.783398628</td>
-      </tr>
-      <tr>
-        <td>80000</td>
-        <td>0.755954504</td>
-      </tr>
-      <tr>
-        <td>90000</td>
-        <td>0.759408832</td>
-      </tr>
-      <tr>
-        <td>110000</td>
-        <td>0.751760781</td>
-      </tr>
-      <tr>
-        <td>120000</td>
-        <td>0.682074368</td>
-      </tr>
-      <tr>
-        <td>130000</td>
-        <td>0.74048388</td>
-      </tr>
-      <tr>
-        <td>140000</td>
-        <td>0.736661911</td>
-      </tr>
-      <tr>
-        <td>150000</td>
-        <td>0.754390478</td>
-      </tr>
-      <tr>
-        <td>160000</td>
-        <td>0.717181146</td>
-      </tr>
-      <tr>
-        <td>170000</td>
-        <td>0.737752676</td>
-      </tr>
-      <tr>
-        <td>180000</td>
-        <td>0.723461688</td>
-      </tr>
-      <tr>
-        <td>190000</td>
-        <td>0.780327737</td>
-      </tr>
-      <tr>
-        <td>200000</td>
-        <td>0.725279272</td>
-      </tr>
-      <tr>
-        <td>210000</td>
-        <td>0.786513925</td>
-      </tr>
-    </table>
-</center>
+# Top 10 Performance Test with F-score (beta-square = 0.3)  
+| Step   | Value    |
+|--------|----------|
+| 55000  | 0.827128 |
+| 123000 | 0.837655 |
+| 130000 | 0.825695 |
+| 139000 | 0.823819 |
+| 159000 | 0.824045 |
+| 180000 | 0.833425 |
+| 194000 | 0.829462 |
+| 218000 | 0.823438 |
+| 227000 | 0.823538 |
+| 243000 | 0.825455 |
 
 
 # Execution Guideline
