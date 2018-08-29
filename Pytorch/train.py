@@ -1,8 +1,8 @@
 import torch
 from torch.utils.data import DataLoader
 import torchvision
-from Network import Unet
-from Dataset import DUTS_dataset
+from network import Unet
+from dataset import DUTSdataset
 from tensorboardX import SummaryWriter
 import datetime
 import os
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     torch.manual_seed(1234)
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-    print("Default path : "+os.getcwd())
+    print("Default path : " + os.getcwd())
     parser.add_argument("--load",
                         help="Directory of pre-trained model, you can download at \n"
                              "https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1A6xLzf8Na/view?usp=sharing\n"
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     device = torch.device(args.cuda)
     batch_size = args.batch_size
     epoch = args.epoch
-    dataset = DUTS_dataset(args.dataset)
+    duts_dataset = DUTSdataset(args.dataset)
     # load = None
     load = args.load
     start_iter = 0
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     opt_dec = torch.optim.SGD(model.decoder.parameters(), lr=learning_rate * 10, momentum=0.9, weight_decay=0.0005)
     # opt_en = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate, weight_decay=0.0005)
     # opt_dec = torch.optim.Adam(model.decoder.parameters(), lr=learning_rate * 10, weight_decay=0.0005)
-    dataloader = DataLoader(dataset, batch_size, shuffle=True, num_workers=0)
+    dataloader = DataLoader(duts_dataset, batch_size, shuffle=True, num_workers=0)
     os.makedirs('log/{}'.format(now.strftime('%m%d%H%M')), exist_ok=True)
     writer = SummaryWriter('log/{}'.format(now.strftime('%m%d%H%M')))
     # print(len(dataloader))

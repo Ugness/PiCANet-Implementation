@@ -1,5 +1,5 @@
 from Network4Att_Test import Unet
-from Dataset import Custom_dataset
+from Dataset import CustomDataset
 import torch
 import os
 import numpy as np
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     state_dict = torch.load(args.model_dir)
     model = Unet().to(device)
     model.load_state_dict(state_dict)
-    dataset = Custom_dataset(root_dir=args.image_dir)
+    dataset = CustomDataset(root_dir=args.image_dir)
     dataloader = DataLoader(dataset, args.batch_size, shuffle=False)
     writer = SummaryWriter('log/Att_test')
     model.eval()
@@ -40,19 +40,20 @@ if __name__ == '__main__':
         with torch.no_grad():
             pred, loss, attention = model(img)
         for j, _attention in enumerate(attention):
-            size = _attention.size()    # batch, (org_size, org_size), (224, ) or (13*224//org_size, )
+            size = _attention.size()  # batch, (org_size, org_size), (224, ) or (13*224//org_size, )
             if size[3] != 224:
-                patch = F.pad(img, (6*224//size[2], 6*224//size[2], 6*224//size[2], 6*224//size[2]))
-                patch = patch.unfold(2, size[3], 224//size[1])\
-                    .unfold(3, size[4], 224//size[2])\
-                    .view(size[0], 3, size[1], size[2], size[3], size[4])     # batch, 3, H, W, H', W'
+                patch = F.pad(img, (6 * 224 // size[2], 6 * 224 // size[2], 6 * 224 // size[2], 6 * 224 // size[2]))
+                patch = patch.unfold(2, size[3], 224 // size[1]) \
+                    .unfold(3, size[4], 224 // size[2]) \
+                    .view(size[0], 3, size[1], size[2], size[3], size[4])  # batch, 3, H, W, H', W'
             else:
                 patch = img.view(size[0], 3, 1, 1, size[3], size[4]).repeat(1, 1, size[1], size[2], 1, 1)
             _attention = _attention.unsqueeze(1).repeat(1, 3, 1, 1, 1, 1)
             att_map = (_attention * patch).view(-1, 3, size[3], size[4])
             # print(att_map)
-            writer.add_image('attention_{}'.format(size[3]), _attention.view(-1, 1, size[3], size[4]), i*len(attention)+j)
-            writer.add_image('att_map_{}'.format(size[3]), att_map, i*len(attention)+j)
+            writer.add_image('attention_{}'.format(size[3]), _attention.view(-1, 1, size[3], size[4]),
+                             i * len(attention) + j)
+            writer.add_image('att_map_{}'.format(size[3]), att_map, i * len(attention) + j)
         pred = pred[5].data
         pred.requires_grad_(False)
         writer.add_image(args.model_dir + ', img', img, i)

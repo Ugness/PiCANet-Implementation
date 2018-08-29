@@ -1,34 +1,63 @@
 # from sklearn.metrics import precision_recall_fscore_support
-from Network import Unet
-from Dataset import DUTS_dataset
+from network import Unet
+from dataset import DUTSDataset
 import torch
 import os
 import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
+
 import argparse
+from sklearn.metrics import precision_recall_curve
 
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
 
     models = sorted(os.listdir('models/state_dict/07121619'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
-    dataset = DUTS_dataset(root_dir='../DUTS-TE', train=False)
-    dataloader = DataLoader(dataset, 4, shuffle=False)
+    duts_dataset = DUTSDataset(root_dir='../DUTS-TE', train=False)
+    dataloader = DataLoader(duts_dataset, 4, shuffle=True)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/PR_curve_demo')
+    writer = SummaryWriter('log/F_Measure')
     model = Unet().to(device)
     for model_name in models:
-        # if int(model_name.split('epo_')[1].split('step')[0]) < 259000:
-        #     continue
-        if int(model_name.split('epo_')[1].split('step')[0]) % 10000 != 0:
+        if int(model_name.split('epo_')[1].split('step')[0]) < 79000:
+            continue
+        if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
             continue
 
         state_dict = torch.load('models/state_dict/07121619/' + model_name)
         model.load_state_dict(state_dict)
         model.eval()
         mse = 0
+        preds = []
+        masks = []
+        for i, batch in enumerate(dataloader):
+            img = batch['image'].to(device)
+            mask = batch['mask'].to(device)
+            with torch.no_grad():
+                pred, loss = model(img, mask)
+            pred = pred[5].data
+            mse += F.mse_loss(pred, mask)
+            pred = pred.requires_grad_(False)
+            preds.append(pred)
+            masks.append(mask)
+            if not i < 100:
+                break
+        pred = torch.stack(preds, 0)
+        mask = torch.stack(masks, 0)
+        writer.add_pr_curve('PR_curve', mask, pred, global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar('MAE', F.mse_loss(pred, mask), global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        prediction = pred.data.cpu().numpy().flatten()
+        target = mask.data.round().cpu().numpy().flatten()
+        # print(type(prediction))
+        precision, recall, threshold = precision_recall_curve(target, prediction)
+        f_score = (1 + beta_square) * precision * recall / (beta_square * precision + recall)
+        writer.add_scalar("Max F_score", np.max(f_score), global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar("Max_F_threshold", threshold[np.argmax(f_score)], global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        print(model_name.split('epo_')[1].split('step')[0])
+        """
         for edge in range(100):
             threshold = edge/100.0
             avg_precision, avg_recall, avg_fscore = [], [], []
@@ -73,3 +102,4 @@ if __name__ == '__main__':
             print('F_score : ' + str(fscore))
         print('MAE:' + str(mse / 10000))
         writer.add_scalar('MAE', mse / 10000, global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        """

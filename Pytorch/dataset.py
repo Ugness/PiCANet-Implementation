@@ -1,10 +1,9 @@
 import os
-import skimage.io as io
 import torch.utils.data as data
-import torch.nn as nn
 import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
+
 
 class Resize(object):
     def __init__(self, size):
@@ -12,8 +11,10 @@ class Resize(object):
 
     def __call__(self, sample):
         img, mask = sample['image'], sample['mask']
-        img, mask = img.resize((self.size, self.size), resample=Image.BILINEAR), mask.resize((self.size, self.size), resample=Image.BILINEAR)
+        img, mask = img.resize((self.size, self.size), resample=Image.BILINEAR), mask.resize((self.size, self.size),
+                                                                                             resample=Image.BILINEAR)
         return {'image': img, 'mask': mask}
+
 
 class RandomCrop(object):
     def __init__(self, size):
@@ -58,7 +59,7 @@ class ToTensor(object):
         return {'image': img, 'mask': mask}
 
 
-class DUTS_dataset(data.Dataset):
+class DUTSdataset(data.Dataset):
     def __init__(self, root_dir, train=True, data_augmentation=True):
         self.image_list = sorted(os.listdir('{}/DUTS-{}-Image'.format(root_dir, 'TR' if train else 'TE')))
         self.mask_list = sorted(os.listdir('{}/DUTS-{}-Mask'.format(root_dir, 'TR' if train else 'TE')))
@@ -88,7 +89,8 @@ class DUTS_dataset(data.Dataset):
         sample = self.transform(sample)
         return sample
 
-class Custom_dataset(data.Dataset):
+
+class CustomDataset(data.Dataset):
     def __init__(self, root_dir):
         self.image_list = sorted(os.listdir(root_dir))
         self.transform = transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor()])
@@ -108,7 +110,7 @@ class Custom_dataset(data.Dataset):
 if __name__ == '__main__':
     # os.chdir('..')
     # print(os.getcwd())
-    ds = DUTS_dataset('../DUTS-TR')
+    ds = DUTSdataset('../DUTS-TR')
     pil = transforms.ToPILImage()
     out = ds[0]
     pil(out['image']).show()

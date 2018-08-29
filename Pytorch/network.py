@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import torchvision
 import time
 
+
 cfg = {'PicaNet': "GGLLL",
        'Size': [28, 28, 28, 56, 112, 224],
        'Channel': [1024, 512, 512, 256, 128, 64],
@@ -14,9 +15,9 @@ cfg = {'PicaNet': "GGLLL",
 
 class Unet(nn.Module):
     def __init__(self, cfg={'PicaNet': "GGLLL",
-                            'Size': [28, 28, 28, 56, 112, 224],
-                            'Channel': [1024, 512, 512, 256, 128, 64],
-                            'loss_ratio': [0.5, 0.5, 0.5, 0.8, 0.8, 1]}):
+       'Size': [28, 28, 28, 56, 112, 224],
+       'Channel': [1024, 512, 512, 256, 128, 64],
+       'loss_ratio': [0.5, 0.5, 0.5, 0.8, 0.8, 1]}):
         super(Unet, self).__init__()
         self.encoder = Encoder()
         self.decoder = nn.ModuleList()
@@ -38,26 +39,21 @@ class Unet(nn.Module):
             x = input[0]
             tar = input[1]
             test_mode = False
-        elif len(input) == 3:
+        if len(input) == 3:
             x = input[0]
             tar = input[1]
             test_mode = input[2]
-        elif len(input) == 1:
+        if len(input) == 1:
             x = input[0]
             tar = None
             test_mode = True
-        else:
-            assert 0
-        En_out = self.encoder(x)
-        Dec = None
+        en_out = self.encoder(x)
+        dec = None
         pred = []
-        attention = []
         for i in range(6):
             # print(En_out[5 - i].size())
-            Dec, _pred, _attention = self.decoder[i](En_out[5 - i], Dec)
+            dec, _pred = self.decoder[i](en_out[5 - i], dec)
             pred.append(_pred)
-            if _attention is not None:
-                attention.append(_attention)
         loss = 0
         if not test_mode:
             for i in range(6):
@@ -65,7 +61,7 @@ class Unet(nn.Module):
                 # print(float(loss))
                 if tar.size()[2] > 28:
                     tar = F.max_pool2d(tar, 2, 2)
-        return pred, loss, attention
+        return pred, loss
 
 
 def make_layers(cfg, in_channels):
@@ -112,9 +108,9 @@ class DecoderCell(nn.Module):
         self.conv1 = nn.Conv2d(2 * in_channel, in_channel, kernel_size=3, padding=1)  # not specified in paper
         self.mode = mode
         if mode == 'G':
-            self.picanet = PiCANet_G(size, in_channel)
+            self.picanet = PicanetG(size, in_channel)
         elif mode == 'L':
-            self.picanet = PiCANet_L(in_channel)
+            self.picanet = PicanetL(in_channel)
         elif mode == 'C':
             self.picanet = None
         else:
@@ -129,24 +125,24 @@ class DecoderCell(nn.Module):
     def forward(self, *input):
         assert len(input) <= 2
         if input[1] is None:
-            En = input[0]
-            Dec = input[0]  # not specified in paper
+            en = input[0]
+            dec = input[0]  # not specified in paper
         else:
-            En = input[0]
-            Dec = input[1]
+            en = input[0]
+            dec = input[1]
 
-        if Dec.size()[2] * 2 == En.size()[2]:
-            Dec = F.upsample(Dec, scale_factor=2, mode='bilinear', align_corners=True)
-        elif Dec.size()[2] != En.size()[2]:
+        if dec.size()[2] * 2 == en.size()[2]:
+            dec = F.upsample(dec, scale_factor=2, mode='bilinear', align_corners=True)
+        elif dec.size()[2] != en.size()[2]:
             assert 0
-        En = self.bn_en(En)
+        En = self.bn_en(en)
         En = F.relu(En)
-        fmap = torch.cat((En, Dec), dim=1)  # F
+        fmap = torch.cat((En, dec), dim=1)  # F
         fmap = self.conv1(fmap)
         fmap = F.relu(fmap)
         if not self.mode == 'C':
             # print(fmap.size())
-            fmap_att, attention = self.picanet(fmap)  # F_att
+            fmap_att = self.picanet(fmap)  # F_att
             x = torch.cat((fmap, fmap_att), 1)
             x = self.conv2(x)
             x = self.bn_feature(x)
@@ -156,14 +152,13 @@ class DecoderCell(nn.Module):
         else:
             Dec_out = self.conv2(fmap)
             _y = F.sigmoid(Dec_out)
-            attention = None
 
-        return Dec_out, _y, attention
+        return Dec_out, _y
 
 
-class PiCANet_G(nn.Module):
+class PicanetG(nn.Module):
     def __init__(self, size, in_channel):
-        super(PiCANet_G, self).__init__()
+        super(PicanetG, self).__init__()
         self.renet = Renet(size, in_channel, 100)
         self.in_channel = in_channel
 
@@ -179,17 +174,12 @@ class PiCANet_G(nn.Module):
         # print(torch.cuda.memory_allocated() / 1024 / 1024)
         x = torch.reshape(x, (size[0], size[1], size[2], size[3]))
         # print(torch.cuda.memory_allocated() / 1024 / 1024)
-        attention = kernel.data
-        attention = attention.requires_grad_(False)
-        attention = torch.reshape(attention, (size[0], -1, 10, 10))
-        attention = F.upsample(attention, 224, mode='bilinear', align_corners=True)
-        attention = torch.reshape(attention, (size[0], size[2], size[3], 224, 224))
-        return x, attention
+        return x
 
 
-class PiCANet_L(nn.Module):
+class PicanetL(nn.Module):
     def __init__(self, in_channel):
-        super(PiCANet_L, self).__init__()
+        super(PicanetL, self).__init__()
         self.conv1 = nn.Conv2d(in_channel, 128, kernel_size=7, dilation=2, padding=6)
         self.conv2 = nn.Conv2d(128, 49, kernel_size=1)
 
@@ -221,13 +211,7 @@ class PiCANet_L(nn.Module):
         x = torch.cat(fmap, 3)
         x = torch.reshape(x, (size[0], size[1], size[2], size[3]))
         """
-        attention = kernel.data
-        attention = attention.requires_grad_(False)
-        attention = torch.reshape(attention, (size[0], -1, 7, 7))
-        attention = F.upsample(attention, int(13 * 224 / size[2]), mode='bilinear', align_corners=True)
-        attention = torch.reshape(attention,
-                                  (size[0], size[2], size[3], int(13 * 224 / size[2]), int(13 * 224 / size[2])))
-        return x, attention
+        return x
 
 
 class Renet(nn.Module):
@@ -246,7 +230,7 @@ class Renet(nn.Module):
     def forward(self, *input):
         x = input[0]
         temp = []
-        size = x.size()  # batch, in_channel, height, width
+        # size = x.size()  # batch, in_channel, height, width
         x = torch.transpose(x, 1, 3)  # batch, width, height, in_channel
         for i in range(self.size):
             h, _ = self.vertical(x[:, :, i, :])
@@ -298,3 +282,4 @@ if __name__ == '__main__':
         print(float(loss))
         print('Time: {}'.format(time.clock()))
     """
+
