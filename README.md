@@ -5,7 +5,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ![target_image](/mask.png)
 
 
-# Description ppt(Korean)
+# PPT(Korean)
 https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 
 
