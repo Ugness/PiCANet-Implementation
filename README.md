@@ -4,6 +4,11 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ![input image](/input.png)
 ![target_image](/mask.png)
 
+
+# Description ppt(Korean)
+https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
+
+
 # Top 10 Performance Test with F-score (beta-square = 0.3)  
 | Step   | Value    |
 |--------|----------|
