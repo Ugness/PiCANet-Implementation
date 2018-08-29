@@ -39,7 +39,7 @@ CUDA 9.0
 cudnn 7.0  
 python 3.5  
 H/W  
-AMD Ryzen 1700
+AMD Ryzen 1700  
 Nvidia gtx 1080ti  
 32GB RAM
 
