@@ -2,7 +2,8 @@
 Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention for Saliency Detection**](https://arxiv.org/abs/1708.06433)
 
 ![input image](/input.png)
-![target_image](/mask.png)
+![target_image](/mask.png)  
+![training_result](/Training_result.JPG)
 
 
 # PPT(Korean)
