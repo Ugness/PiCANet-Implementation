@@ -27,11 +27,11 @@ class Unet(nn.Module):
                 DecoderCell(size=cfg['Size'][i],
                             in_channel=cfg['Channel'][i],
                             out_channel=cfg['Channel'][i + 1],
-                            mode=cfg['PicaNet'][i]).cuda())
+                            mode=cfg['PicaNet'][i]))
         self.decoder.append(DecoderCell(size=cfg['Size'][5],
                                         in_channel=cfg['Channel'][5],
                                         out_channel=1,
-                                        mode='C').cuda())
+                                        mode='C'))
 
     def forward(self, *input):
         if len(input) == 2:
