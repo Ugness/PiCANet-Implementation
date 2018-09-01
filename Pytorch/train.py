@@ -25,7 +25,7 @@ if __name__ == '__main__':
                         help="Directory of pre-trained model, you can download at \n"
                              "https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1A6xLzf8Na/view?usp=sharing\n"
                              "None --> Do not use pre-trained model. Training will start from random initialized model")
-    parser.add_argument('--dataset', help='Directory of your DUTS dataset "folder"', default='/DUTS-TR')
+    parser.add_argument('--dataset', help='Directory of your DUTS dataset "folder"', default='../DUTS-TR')
     parser.add_argument('--cuda', help="'cuda' for cuda, 'cpu' for cpu, default = cuda", default='cuda')
     parser.add_argument('--batch_size', help="batchsize, default = 1", default=1, type=int)
     parser.add_argument('--epoch', help='# of epochs. default = 20', default=20, type=int)
