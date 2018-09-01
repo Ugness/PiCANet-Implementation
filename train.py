@@ -1,8 +1,8 @@
 import torch
 from torch.utils.data import DataLoader
 import torchvision
-from network import Unet
-from dataset import DUTSdataset
+from Pytorch.network import Unet
+from Pytorch.dataset import DUTSdataset
 from tensorboardX import SummaryWriter
 import datetime
 import os
