@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('-img', '--image_dir', help='Directory of your test_image ""folder""', default='/test')
     parser.add_argument('--cuda', help="cuda for cuda, cpu for cpu, default = cuda", default='cuda')
     parser.add_argument('--batch_size', help="batchsize, default = 4", default=4, type=int)
-    parser.add_argument('--logdir', help="logdir, default = log/Image_test", default='Pytorch/log/Image_test')
+    parser.add_argument('--logdir', help="logdir, default = Pytorch/log/Image_test", default='Pytorch/log/Image_test')
     args = parser.parse_args()
 
     print(args)
