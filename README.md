@@ -28,7 +28,7 @@ https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 # Execution Guideline
 ## Requirements
 Pillow==4.3.0  
-pytorch==0.4.0  
+pytorch==0.4.1  
 tensorboardX==1.1  
 torchvision==0.2.1  
 numpy==1.14.2  
