@@ -135,9 +135,9 @@ class DecoderCell(nn.Module):
             dec = F.upsample(dec, scale_factor=2, mode='bilinear', align_corners=True)
         elif dec.size()[2] != en.size()[2]:
             assert 0
-        En = self.bn_en(en)
-        En = F.relu(En)
-        fmap = torch.cat((En, dec), dim=1)  # F
+        en = self.bn_en(en)
+        en = F.relu(en)
+        fmap = torch.cat((en, dec), dim=1)  # F
         fmap = self.conv1(fmap)
         fmap = F.relu(fmap)
         if not self.mode == 'C':
@@ -146,14 +146,14 @@ class DecoderCell(nn.Module):
             x = torch.cat((fmap, fmap_att), 1)
             x = self.conv2(x)
             x = self.bn_feature(x)
-            Dec_out = F.relu(x)
-            _y = self.conv3(Dec_out)
+            dec_out = F.relu(x)
+            _y = self.conv3(dec_out)
             _y = F.sigmoid(_y)
         else:
-            Dec_out = self.conv2(fmap)
-            _y = F.sigmoid(Dec_out)
+            dec_out = self.conv2(fmap)
+            _y = F.sigmoid(dec_out)
 
-        return Dec_out, _y
+        return dec_out, _y
 
 
 class PicanetG(nn.Module):
