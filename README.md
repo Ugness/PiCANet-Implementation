@@ -44,6 +44,12 @@ AMD Ryzen 1700
 Nvidia gtx 1080ti  
 32GB RAM
 
+## Docker image(Unstable)
+https://hub.docker.com/r/wogns98/picanet/  
+based on pytorch/pytorch  
+codes in /workspace/PiCANet-Implementation  
+You can run code by add images and download models from [google drive](https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1)  
+
 ## You can run the file by following the descriptions in -h option.
 <code>
     python train.py -h
