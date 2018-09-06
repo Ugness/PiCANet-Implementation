@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print(os.getcwd())
     device = torch.device(args.cuda)
     # args.model_dir = 'models/state_dict/07121619/0epo_1000step.ckpt'
-    state_dict = torch.load(args.model_dir)
+    state_dict = torch.load(args.model_dir, map_location=args.cuda)
     # state_dict = torch.load(model_dir)
     model = Unet().to(device)
     model.load_state_dict(state_dict)

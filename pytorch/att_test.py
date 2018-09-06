@@ -27,7 +27,7 @@ if __name__ == '__main__':
     print(os.getcwd())
     device = torch.device(args.cuda)
     # model_dir = 'models/07121619/25epo_210000step.ckpt'
-    state_dict = torch.load(args.model_dir)
+    state_dict = torch.load(args.model_dir, map_location=args.cuda)
     model = Unet().to(device)
     model.load_state_dict(state_dict)
     dataset = CustomDataset(root_dir=args.image_dir)

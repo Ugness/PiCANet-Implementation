@@ -57,7 +57,7 @@ if __name__ == '__main__':
     start_epo = 0
     del vgg
     if load is not None:
-        state_dict = torch.load(load)
+        state_dict = torch.load(load, map_location=args.cuda)
 
         start_iter = int(load.split('epo_')[1].strip('step.ckpt')) + 1
         start_epo = int(load.split('/')[3].split('epo')[0])

@@ -4,10 +4,9 @@ import torch
 import os
 import numpy as np
 from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 import argparse
 import torchvision
-
 
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
@@ -27,13 +26,16 @@ if __name__ == '__main__':
     print(args)
     print(os.getcwd())
     device = torch.device(args.cuda)
-    # args.model_dir = 'pytorch/models/state_dict/07121619/0epo_1000step.ckpt'
-    state_dict = torch.load(args.model_dir)
+    args.model_dir = 'pytorch/models/state_dict/07121619/14epo_123000step.ckpt'
+    state_dict = torch.load(args.model_dir, map_location=args.cuda)
     # state_dict = torch.load(model_dir)
     model = Unet().to(device)
     model.load_state_dict(state_dict)
     custom_dataset = CustomDataset(root_dir=args.image_dir)
     dataloader = DataLoader(custom_dataset, args.batch_size, shuffle=False)
+
+    # print(state_dict.keys())
+
     # writer = SummaryWriter(args.logdir)
     model.eval()
     os.makedirs(args.logdir + '/img', exist_ok=True)
