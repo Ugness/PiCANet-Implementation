@@ -80,17 +80,21 @@ class DUTSdataset(data.Dataset):
         if len(self.image_list) > len(self.mask_list):
             for image in self.image_list:
                 for mask in self.mask_list:
-                    if image.split("Image")[-1].split(".")[-1] == mask.split("Mask")[-1].split(".")[-1]:
+                    if image.split("Image")[-1].split(".")[-2] == mask.split("Mask")[-1].split(".")[-2]:
+                        print(image.split("Image")[-1].split(".")[-2])
                         flag = False
                 if flag:
-                    os.remove(image)
+                    print(image + ' Deleted')
+                    os.remove('{}/DUTS-{}-Image/{}'.format(self.root_dir, 'TR' if self.train else 'TE', image))
         else:
             for mask in self.mask_list:
                 for image in self.image_list:
-                    if image.split("Image")[-1].split(".")[-1] == mask.split("Mask")[-1].split(".")[-1]:
+                    if image.split("Image")[-1].split(".")[-2] == mask.split("Mask")[-1].split(".")[-2]:
+                        print(image.split("Image")[-1].split(".")[-2])
                         flag = False
                 if flag:
-                    os.remove(mask)
+                    print(mask + ' Deleted')
+                    os.remove('{}/DUTS-{}-Mask/{}'.format(self.root_dir, 'TR' if self.train else 'TE', mask))
         self.image_list = sorted(os.listdir('{}/DUTS-{}-Image'.format(self.root_dir, 'TR' if self.train else 'TE')))
         self.mask_list = sorted(os.listdir('{}/DUTS-{}-Mask'.format(self.root_dir, 'TR' if self.train else 'TE')))
 
@@ -132,7 +136,8 @@ if __name__ == '__main__':
     # os.chdir('..')
     # print(os.getcwd())
     ds = DUTSdataset('../DUTS-TR')
-    pil = transforms.ToPILImage()
-    out = ds[0]
-    pil(out['image']).show()
-    pil(out['mask']).show()
+    # pil = transforms.ToPILImage()
+    # out = ds[0]
+    # pil(out['image']).show()
+    # pil(out['mask']).show()
+    ds.arrange()
