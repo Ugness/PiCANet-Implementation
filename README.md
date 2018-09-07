@@ -44,6 +44,14 @@ AMD Ryzen 1700
 Nvidia gtx 1080ti  
 32GB RAM
 
+## Docker environment
+```
+docker run --name=torch -it -rm pytorch/pytorch
+pip install tensorboardX
+pip install datetime
+git clone https://github.com/Ugness/PiCANet-Implementation
+```
+
 ## Docker image(Unstable)
 https://hub.docker.com/r/wogns98/picanet/  
 based on pytorch/pytorch  
