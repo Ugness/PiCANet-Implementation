@@ -112,6 +112,7 @@ You can download pre-trained models from https://drive.google.com/drive/folders/
 I used DUTS dataset as Training dataset and Test dataset.  
 You can download dataset from http://saliencydetection.net/duts/#outline-container-orgab269ec.
 * Caution: You should check the dataset's Image and GT are matched or not. (ex. # of images, name, ...)
+* You can match the file names and automatically remove un-matched datas by using DUTSdataset.arrange(self) method
 
 ### Execution Example
 Assume you train the model with  
