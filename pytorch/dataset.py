@@ -61,6 +61,8 @@ class ToTensor(object):
 
 class DUTSdataset(data.Dataset):
     def __init__(self, root_dir, train=True, data_augmentation=True):
+        self.root_dir = root_dir
+        self.train = train
         self.image_list = sorted(os.listdir('{}/DUTS-{}-Image'.format(root_dir, 'TR' if train else 'TE')))
         self.mask_list = sorted(os.listdir('{}/DUTS-{}-Mask'.format(root_dir, 'TR' if train else 'TE')))
         self.transform = transforms.Compose(
@@ -72,6 +74,25 @@ class DUTSdataset(data.Dataset):
         self.root_dir = root_dir
         self.train = train
         self.data_augmentation = data_augmentation
+
+    def arrange(self):
+        flag = True
+        if len(self.image_list) > len(self.mask_list):
+            for image in self.image_list:
+                for mask in self.mask_list:
+                    if image.split("Image")[-1].split(".")[-1] == mask.split("Mask")[-1].split(".")[-1]:
+                        flag = False
+                if flag:
+                    os.remove(image)
+        else:
+            for mask in self.mask_list:
+                for image in self.image_list:
+                    if image.split("Image")[-1].split(".")[-1] == mask.split("Mask")[-1].split(".")[-1]:
+                        flag = False
+                if flag:
+                    os.remove(mask)
+        self.image_list = sorted(os.listdir('{}/DUTS-{}-Image'.format(self.root_dir, 'TR' if self.train else 'TE')))
+        self.mask_list = sorted(os.listdir('{}/DUTS-{}-Mask'.format(self.root_dir, 'TR' if self.train else 'TE')))
 
     def __len__(self):
         return len(self.image_list)
