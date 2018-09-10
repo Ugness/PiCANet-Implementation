@@ -66,13 +66,18 @@ class Unet(nn.Module):
 
 def make_layers(cfg, in_channels):
     layers = []
+    dilation_flag = False
     for v in cfg:
         if v == 'M':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
         elif v == 'm':
             layers += [nn.MaxPool2d(kernel_size=1, stride=1)]
+            dilation_flag = True
         else:
-            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
+            if not dilation_flag:
+                conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
+            else:
+                conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=2, dilation=2)
             layers += [conv2d, nn.ReLU(inplace=True)]
             in_channels = v
     return nn.Sequential(*layers)
@@ -105,7 +110,7 @@ class DecoderCell(nn.Module):
     def __init__(self, size, in_channel, out_channel, mode):
         super(DecoderCell, self).__init__()
         self.bn_en = nn.BatchNorm2d(in_channel)
-        self.conv1 = nn.Conv2d(2 * in_channel, in_channel, kernel_size=3, padding=1)  # not specified in paper
+        self.conv1 = nn.Conv2d(2 * in_channel, in_channel, kernel_size=1, padding=0)  # not specified in paper
         self.mode = mode
         if mode == 'G':
             self.picanet = PicanetG(size, in_channel)
@@ -116,11 +121,11 @@ class DecoderCell(nn.Module):
         else:
             assert 0
         if not mode == 'C':
-            self.conv2 = nn.Conv2d(2 * in_channel, out_channel, kernel_size=3, padding=1)  # not specified in paper
+            self.conv2 = nn.Conv2d(2 * in_channel, out_channel, kernel_size=1, padding=0)  # not specified in paper
             self.bn_feature = nn.BatchNorm2d(out_channel)
             self.conv3 = nn.Conv2d(out_channel, 1, kernel_size=1, padding=0)  # not specified in paper
         else:
-            self.conv2 = nn.Conv2d(in_channel, 1, kernel_size=3, padding=1)
+            self.conv2 = nn.Conv2d(in_channel, 1, kernel_size=1, padding=0)
 
     def forward(self, *input):
         assert len(input) <= 2
