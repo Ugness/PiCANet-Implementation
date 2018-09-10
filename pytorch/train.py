@@ -127,5 +127,6 @@ if __name__ == '__main__':
                 # opt_en = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate, weight_decay=0.0005)
                 # opt_dec = torch.optim.Adam(model.decoder.parameters(), lr=learning_rate * 10, weight_decay=0.0005)
             iterate += 1
+            print('iterate' + str(iterate))
             del loss
         start_iter = 0
