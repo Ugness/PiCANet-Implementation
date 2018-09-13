@@ -20,7 +20,7 @@ https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 | Step   | Value    |
 |--------|----------|
 | 55000  | 0.827128 |
-| 123000 | 0.837655 |
+| **123000** | **0.837655** |
 | 130000 | 0.825695 |
 | 139000 | 0.823819 |
 | 159000 | 0.824045 |
