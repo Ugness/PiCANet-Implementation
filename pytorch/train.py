@@ -42,6 +42,7 @@ if __name__ == '__main__':
     duts_dataset = DUTSdataset(args.dataset)
     # load = None
     load = args.load
+    # load = 'models/state_dict/09102252/19epo_189800step.ckpt'
     start_iter = 0
     # noise = torch.randn((batch_size, 3, 224, 224)).type(torch.cuda.FloatTensor)
     # target = torch.randn((batch_size, 1, 224, 224)).type(torch.cuda.FloatTensor)

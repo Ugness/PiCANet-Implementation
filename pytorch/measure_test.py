@@ -1,6 +1,6 @@
 # from sklearn.metrics import precision_recall_fscore_support
 from network import Unet
-from dataset import DUTSDataset
+from dataset import DUTSdataset
 import torch
 import os
 import torch.nn.functional as F
@@ -14,20 +14,20 @@ from sklearn.metrics import precision_recall_curve
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
 
-    models = sorted(os.listdir('models/state_dict/07121619'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
-    duts_dataset = DUTSDataset(root_dir='../DUTS-TE', train=False)
+    models = sorted(os.listdir('models/state_dict/09102252'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
+    duts_dataset = DUTSdataset(root_dir='../DUTS-TE', train=False)
     dataloader = DataLoader(duts_dataset, 4, shuffle=True)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/F_Measure')
+    writer = SummaryWriter('log/F_Measure/09102252')
     model = Unet().to(device)
     for model_name in models:
-        if int(model_name.split('epo_')[1].split('step')[0]) < 79000:
+        if int(model_name.split('epo_')[1].split('step')[0]) < 104000:
             continue
         if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
             continue
 
-        state_dict = torch.load('models/state_dict/07121619/' + model_name)
+        state_dict = torch.load('models/state_dict/09102252/' + model_name)
         model.load_state_dict(state_dict)
         model.eval()
         mse = 0
