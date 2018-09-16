@@ -13,16 +13,16 @@ https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 # Top 10 Performance Test with F-score (beta-square = 0.3)  
 | Step   | Value    |
 |--------|----------|
-| 55000  | 0.827128 |
-| 123000 | 0.837655 |
-| 130000 | 0.825695 |
-| 139000 | 0.823819 |
-| 159000 | 0.824045 |
-| 180000 | 0.833425 |
-| 194000 | 0.829462 |
-| 218000 | 0.823438 |
-| 227000 | 0.823538 |
-| 243000 | 0.825455 |
+| 94000  | 0.808461 |
+| 116000 | 0.803307 |
+| **141000** | **0.815086** |
+| 148000 | 0.803823 |
+| 151000 | 0.806831 |
+| 152000 | 0.805117 |
+| 158000 | 0.813095 |
+| 162000 | 0.813473 |
+| 179000 | 0.806976 |
+| 188000 | 0.803061 |
 
 
 # Execution Guideline
@@ -56,7 +56,7 @@ git clone https://github.com/Ugness/PiCANet-Implementation
 https://hub.docker.com/r/wogns98/picanet/  
 based on pytorch/pytorch  
 codes in /workspace/PiCANet-Implementation  
-You can run code by add images and download models from [google drive](https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1)  
+You can run code by add images and download models from [google drive](https://drive.google.com/drive/u/0/folders/1CDtjAjTeNCh8mx-FVmkE9MZCUwO0YelU)  
 
 ## You can run the file by following the descriptions in -h option.
 <code>
