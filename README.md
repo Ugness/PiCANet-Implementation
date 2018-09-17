@@ -4,7 +4,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ## Some Implementation errors
 * **[All of the conv kernels in DecoderCell(nn.Module) should be set to 1x1 #8](https://github.com/Ugness/PiCANet-Implementation/issues/8)**
 * Adjusted code in [branch:adjusted](https://github.com/Ugness/PiCANet-Implementation/tree/Adjusted_Picanet). ~~I will merge the branch after training and testing adjusted model. (about 9/20)~~
-* Since the performace of the model with 3*3 kernel is better than original one, this version remains as master branch.
+* Since the performace of a model with 3*3 kernel is better than original one, this version remains as master branch.
 * Thanks for @Sucran's advice.
 
 
