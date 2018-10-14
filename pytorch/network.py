@@ -204,7 +204,7 @@ class PicanetL(nn.Module):
         kernel = self.conv1(x)
         kernel = self.conv2(kernel)
         kernel = F.softmax(kernel, 1)
-        kernel = kernel.reshape(size[0], size[2] * size[3], 7 * 7)
+        kernel = kernel.reshape(size[0], 1, size[2] * size[3], 7 * 7)
         # print("Before unfold", x.shape)
         x = F.unfold(x, kernel_size=[7, 7], dilation=[2, 2], padding=6)
         # print("After unfold", x.shape)
