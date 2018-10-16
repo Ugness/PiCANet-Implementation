@@ -1,6 +1,12 @@
 # PiCANet-Implementation
 Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention for Saliency Detection**](https://arxiv.org/abs/1708.06433)
 
+## Improved version
+* at [branch:Fold_Unfold](https://github.com/Ugness/PiCANet-Implementation/tree/Fold_Unfold) 
+  * the version with improved PiCANet calculation.
+  * less time consume, less memory consume.
+  * The result of this version will be uploaded ASAP.
+
 ## Some Implementation errors
 * **[All of the conv kernels in DecoderCell(nn.Module) should be set to 1x1 #8](https://github.com/Ugness/PiCANet-Implementation/issues/8)**
 * Adjusted code in [branch:adjusted](https://github.com/Ugness/PiCANet-Implementation/tree/Adjusted_Picanet). ~~I will merge the branch after training and testing adjusted model. (about 9/20)~~
