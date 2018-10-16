@@ -3,6 +3,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 
 ## Improved version
 * at [branch:Fold_Unfold](https://github.com/Ugness/PiCANet-Implementation/tree/Fold_Unfold) 
+  * Thanks for Sucran's [Issue #9](https://github.com/Ugness/PiCANet-Implementation/issues/9).
   * the version with improved PiCANet calculation.
   * less time consume, less memory consume.
   * The result of this version will be uploaded ASAP.
