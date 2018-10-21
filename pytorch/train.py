@@ -27,7 +27,7 @@ if __name__ == '__main__':
                              "None --> Do not use pre-trained model. Training will start from random initialized model")
     parser.add_argument('--dataset', help='Directory of your DUTS dataset "folder"', default='../DUTS-TR')
     parser.add_argument('--cuda', help="'cuda' for cuda, 'cpu' for cpu, default = cuda", default='cuda')
-    parser.add_argument('--batch_size', help="batchsize, default = 1", default=4, type=int)
+    parser.add_argument('--batch_size', help="batchsize, default = 1", default=1, type=int)
     parser.add_argument('--epoch', help='# of epochs. default = 20', default=20, type=int)
     parser.add_argument('-lr', '--learning_rate', help='learning_rate. default = 0.001', default=0.001, type=float)
     parser.add_argument('--lr_decay', help='Learning rate decrease by lr_decay time per decay_step, default = 0.1',
