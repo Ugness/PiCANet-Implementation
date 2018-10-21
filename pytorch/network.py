@@ -183,12 +183,6 @@ class PicanetG(nn.Module):
         x = torch.matmul(x, kernel)
         # print(x.shape)
         x = x.reshape(size[0], size[1], size[2], size[3])
-
-        # x = torch.unsqueeze(x, 0)
-        # x = F.conv3d(input=x, weight=kernel, bias=None, stride=1, padding=0, dilation=(1, 3, 3), groups=size[0])
-        # print(torch.cuda.memory_allocated() / 1024 / 1024)
-        # x = torch.reshape(x, (size[0], size[1], size[2], size[3]))
-        # print(torch.cuda.memory_allocated() / 1024 / 1024)
         return x
 
 
