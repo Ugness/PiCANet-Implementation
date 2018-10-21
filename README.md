@@ -11,7 +11,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 ![target_image](readme_images/mask.png)
 ![training_result](readme_images/Training_result.JPG)  
 
-![graph](graph.png){: height="100px" width="100px"}
+![graph](graph.png)
 
 
 
