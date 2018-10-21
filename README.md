@@ -3,7 +3,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 
 
 ## New method to implement PiCANet
-* #[Issue9](https://github.com/Ugness/PiCANet-Implementation/issues/9)
+* [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9)
 * Conv3d version is deleted.
 
 ## Some Implementation errors
