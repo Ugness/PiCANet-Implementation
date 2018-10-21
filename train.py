@@ -126,6 +126,6 @@ if __name__ == '__main__':
                                           weight_decay=0.0005)
                 # opt_en = torch.optim.Adam(model.encoder.parameters(), lr=learning_rate, weight_decay=0.0005)
                 # opt_dec = torch.optim.Adam(model.decoder.parameters(), lr=learning_rate * 10, weight_decay=0.0005)
-            iterate += 1
+            iterate += args.batchsize
             del loss
         start_iter = 0

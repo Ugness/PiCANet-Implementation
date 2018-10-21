@@ -22,8 +22,6 @@ if __name__ == '__main__':
     writer = SummaryWriter('log/F_Measure/09102252')
     model = Unet().to(device)
     for model_name in models:
-        if int(model_name.split('epo_')[1].split('step')[0]) < 104000:
-            continue
         if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
             continue
 
