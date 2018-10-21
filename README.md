@@ -1,6 +1,12 @@
 # PiCANet-Implementation
 Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention for Saliency Detection**](https://arxiv.org/abs/1708.06433)
 
+## Some Implementation errors
+* **[All of the conv kernels in DecoderCell(nn.Module) should be set to 1x1 #8](https://github.com/Ugness/PiCANet-Implementation/issues/8)**
+* Adjusted code in [branch:adjusted](https://github.com/Ugness/PiCANet-Implementation/tree/Adjusted_Picanet). ~~I will merge the branch after training and testing adjusted model. (about 9/20)~~
+* Thanks for @Sucran's advice.
+
+
 ![input image](readme_images/input.png)
 ![target_image](readme_images/mask.png)
 ![training_result](readme_images/Training_result.JPG)
@@ -10,7 +16,25 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 
 
-# Top 10 Performance Test with F-score (beta-square = 0.3)  
+# Top 10 Performance Test with F-score (beta-square = 0.3)  (Conv block by 3*3 different from paper)  
+batchsize:4
+
+| Step   | Value    |
+|--------|----------|
+| 100000 | 0.865094 |
+| 131000 | 0.866099 |
+| 214000 | 0.865814 |
+| 259000 | 0.866556 |
+| 275000 | 0.868446 |
+| 281000 | 0.869376 |
+| **383000** | **0.870971** |
+| 392000 | 0.865107 |
+| 399000 | 0.866888 |
+| 410000 | 0.866439 |
+
+# Top 10 Performance Test with F-score (beta-square = 0.3)  (Conv block by 1*1 same as paper: [branch:Adjusted](https://github.com/Ugness/PiCANet-Implementation/tree/Adjusted_Picanet))
+batchsize:1
+
 | Step   | Value    |
 |--------|----------|
 | 94000  | 0.808461 |
@@ -56,7 +80,7 @@ git clone https://github.com/Ugness/PiCANet-Implementation
 https://hub.docker.com/r/wogns98/picanet/  
 based on pytorch/pytorch  
 codes in /workspace/PiCANet-Implementation  
-You can run code by add images and download models from [google drive](https://drive.google.com/drive/u/0/folders/1CDtjAjTeNCh8mx-FVmkE9MZCUwO0YelU)  
+You can run code by add images and download models from [google drive](https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1)  
 
 ## You can run the file by following the descriptions in -h option.
 <code>
@@ -112,6 +136,7 @@ You can download pre-trained models from https://drive.google.com/drive/folders/
 I used DUTS dataset as Training dataset and Test dataset.  
 You can download dataset from http://saliencydetection.net/duts/#outline-container-orgab269ec.
 * Caution: You should check the dataset's Image and GT are matched or not. (ex. # of images, name, ...)
+* You can match the file names and automatically remove un-matched datas by using DUTSdataset.arrange(self) method
 
 ### Execution Example
 Assume you train the model with  
