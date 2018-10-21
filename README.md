@@ -6,11 +6,6 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 * [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9)
 * Conv3d version is deleted.
 
-## Some Implementation errors
-* **[All of the conv kernels in DecoderCell(nn.Module) should be set to 1x1 #8](https://github.com/Ugness/PiCANet-Implementation/issues/8)**
-* Adjusted code in [branch:adjusted](https://github.com/Ugness/PiCANet-Implementation/tree/Adjusted_Picanet).
-* Thanks for @Sucran's advice.
-
 
 ![input image](readme_images/input.png)
 ![target_image](readme_images/mask.png)
@@ -27,7 +22,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 
 
-# Top 10 Performance Test with F-score (beta-square = 0.3)  (Conv block by 3*3 different from paper)  
+# Top 10 Performance Test with F-score (beta-square = 0.3)
 batchsize:4
 
 | Step   | Value    |
@@ -42,22 +37,6 @@ batchsize:4
 | 392000 | 0.865107 |
 | 399000 | 0.866888 |
 | 410000 | 0.866439 |
-
-# Top 10 Performance Test with F-score (beta-square = 0.3)  (Conv block by 1*1 same as paper: [branch:Adjusted](https://github.com/Ugness/PiCANet-Implementation/tree/Adjusted_Picanet))
-batchsize:1
-
-| Step   | Value    |
-|--------|----------|
-| 94000  | 0.808461 |
-| 116000 | 0.803307 |
-| **141000** | **0.815086** |
-| 148000 | 0.803823 |
-| 151000 | 0.806831 |
-| 152000 | 0.805117 |
-| 158000 | 0.813095 |
-| 162000 | 0.813473 |
-| 179000 | 0.806976 |
-| 188000 | 0.803061 |
 
 
 # Execution Guideline
