@@ -114,7 +114,7 @@ class DecoderCell(nn.Module):
     def __init__(self, size, in_channel, out_channel, mode):
         super(DecoderCell, self).__init__()
         self.bn_en = nn.BatchNorm2d(in_channel)
-        self.conv1 = nn.Conv2d(2 * in_channel, in_channel, kernel_size=1, padding=0)  # not specified in paper
+        self.conv1 = nn.Conv2d(2 * in_channel, in_channel, kernel_size=1, padding=0)
         self.mode = mode
         if mode == 'G':
             self.picanet = PicanetG(size, in_channel)
@@ -125,9 +125,9 @@ class DecoderCell(nn.Module):
         else:
             assert 0
         if not mode == 'C':
-            self.conv2 = nn.Conv2d(2 * in_channel, out_channel, kernel_size=1, padding=0)  # not specified in paper
+            self.conv2 = nn.Conv2d(2 * in_channel, out_channel, kernel_size=1, padding=0)
             self.bn_feature = nn.BatchNorm2d(out_channel)
-            self.conv3 = nn.Conv2d(out_channel, 1, kernel_size=1, padding=0)  # not specified in paper
+            self.conv3 = nn.Conv2d(out_channel, 1, kernel_size=1, padding=0)
         else:
             self.conv2 = nn.Conv2d(in_channel, 1, kernel_size=1, padding=0)
 
