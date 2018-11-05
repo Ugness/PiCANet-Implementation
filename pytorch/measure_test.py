@@ -19,7 +19,7 @@ if __name__ == '__main__':
     dataloader = DataLoader(duts_dataset, 4, shuffle=True)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/F_Measure/09102252')
+    writer = SummaryWriter('log/F_Measure/09102252_adjusted')
     model = Unet().to(device)
     for model_name in models:
         if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
@@ -41,19 +41,23 @@ if __name__ == '__main__':
             pred = pred.requires_grad_(False)
             preds.append(pred)
             masks.append(mask)
-            if not i < 100:
-                break
         pred = torch.stack(preds, 0)
         mask = torch.stack(masks, 0)
         writer.add_pr_curve('PR_curve', mask, pred, global_step=int(model_name.split('epo_')[1].split('step')[0]))
         writer.add_scalar('MAE', torch.mean(torch.abs(pred - mask)), global_step=int(model_name.split('epo_')[1].split('step')[0]))
         prediction = pred.data.cpu().numpy().flatten()
         target = mask.data.round().cpu().numpy().flatten()
-        # print(type(prediction))
-        precision, recall, threshold = precision_recall_curve(target, prediction)
-        f_score = (1 + beta_square) * precision * recall / (beta_square * precision + recall)
+        # Measure method from https://github.com/AceCoooool/DSS-pytorch solver.py
+        prec, recall = torch.zeros(256), torch.zeros(256)
+        thlist = torch.linspace(0, 1 - 1e-10, 256)
+        for i in range(256):
+            y_temp = (pred >= thlist[i]).float()
+            tp = (y_temp * mask).sum()
+            prec[i], recall[i] = tp / (y_temp.sum() + 1e-20), tp / mask.sum()
+
+        f_score = (1 + beta_square) * prec * recall / (beta_square * prec + recall)
         writer.add_scalar("Max F_score", np.max(f_score), global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar("Max_F_threshold", threshold[np.argmax(f_score)], global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar("Max_F_threshold", thlist[np.argmax(f_score)], global_step=int(model_name.split('epo_')[1].split('step')[0]))
         print(model_name.split('epo_')[1].split('step')[0])
         """
         for edge in range(100):
