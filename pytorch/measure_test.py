@@ -41,12 +41,10 @@ if __name__ == '__main__':
             pred = pred.requires_grad_(False)
             preds.append(pred)
             masks.append(mask)
-        pred = torch.stack(preds, 0)
-        mask = torch.stack(masks, 0)
+        pred = torch.stack(preds, 0).cpu()
+        mask = torch.stack(masks, 0).cpu()
         writer.add_pr_curve('PR_curve', mask, pred, global_step=int(model_name.split('epo_')[1].split('step')[0]))
         writer.add_scalar('MAE', torch.mean(torch.abs(pred - mask)), global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        prediction = pred.data.cpu().numpy().flatten()
-        target = mask.data.round().cpu().numpy().flatten()
         # Measure method from https://github.com/AceCoooool/DSS-pytorch solver.py
         prec, recall = torch.zeros(256), torch.zeros(256)
         thlist = torch.linspace(0, 1 - 1e-10, 256)
@@ -56,8 +54,8 @@ if __name__ == '__main__':
             prec[i], recall[i] = tp / (y_temp.sum() + 1e-20), tp / mask.sum()
 
         f_score = (1 + beta_square) * prec * recall / (beta_square * prec + recall)
-        writer.add_scalar("Max F_score", np.max(f_score), global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar("Max_F_threshold", thlist[np.argmax(f_score)], global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar("Max F_score", torch.max(f_score), global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar("Max_F_threshold", thlist[torch.argmax(f_score)], global_step=int(model_name.split('epo_')[1].split('step')[0]))
         print(model_name.split('epo_')[1].split('step')[0])
         """
         for edge in range(100):
