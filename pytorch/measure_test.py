@@ -28,7 +28,7 @@ if __name__ == '__main__':
         state_dict = torch.load('models/state_dict/09102252/' + model_name)
         model.load_state_dict(state_dict)
         model.eval()
-        mse = 0
+        mae = 0
         preds = []
         masks = []
         for i, batch in enumerate(dataloader):
@@ -37,7 +37,7 @@ if __name__ == '__main__':
             with torch.no_grad():
                 pred, loss = model(img, mask)
             pred = pred[5].data
-            mse += F.mse_loss(pred, mask)
+            mae += torch.mean(torch.abs(pred - mask))
             pred = pred.requires_grad_(False)
             preds.append(pred)
             masks.append(mask)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         pred = torch.stack(preds, 0)
         mask = torch.stack(masks, 0)
         writer.add_pr_curve('PR_curve', mask, pred, global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar('MAE', F.mse_loss(pred, mask), global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        writer.add_scalar('MAE', torch.mean(torch.abs(pred - mask)), global_step=int(model_name.split('epo_')[1].split('step')[0]))
         prediction = pred.data.cpu().numpy().flatten()
         target = mask.data.round().cpu().numpy().flatten()
         # print(type(prediction))
@@ -67,7 +67,7 @@ if __name__ == '__main__':
                     pred, loss = model(img, mask)
                 pred = pred[5].data
                 writer.add_pr_curve('1234', mask, pred)
-                mse += F.mse_loss(pred, mask)
+                mae += F.mse_loss(pred, mask)
                 pred = pred.requires_grad_(False)
                 pred = torch.round(pred + threshold - 0.5).data
                 t = mask.type(torch.cuda.FloatTensor)
@@ -98,6 +98,6 @@ if __name__ == '__main__':
             print('Precision : ' + str(precision))
             print('Recall : ' + str(recall))
             print('F_score : ' + str(fscore))
-        print('MAE:' + str(mse / 10000))
-        writer.add_scalar('MAE', mse / 10000, global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        print('MAE:' + str(mae / 10000))
+        writer.add_scalar('MAE', mae / 10000, global_step=int(model_name.split('epo_')[1].split('step')[0]))
         """

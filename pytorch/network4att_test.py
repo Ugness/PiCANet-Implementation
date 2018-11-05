@@ -151,7 +151,7 @@ class DecoderCell(nn.Module):
         fmap = F.relu(fmap)
         if not self.mode == 'C':
             # print(fmap.size())
-            fmap_att = self.picanet(fmap)  # F_att
+            fmap_att, attention = self.picanet(fmap)  # F_att
             x = torch.cat((fmap, fmap_att), 1)
             x = self.conv2(x)
             x = self.bn_feature(x)
@@ -161,8 +161,9 @@ class DecoderCell(nn.Module):
         else:
             dec_out = self.conv2(fmap)
             _y = F.sigmoid(dec_out)
+            attention = None
 
-        return dec_out, _y
+        return dec_out, _y, attention
 
 
 class PicanetG(nn.Module):
@@ -177,11 +178,14 @@ class PicanetG(nn.Module):
         kernel = self.renet(x)
         kernel = F.softmax(kernel, 1)
         # print(kernel.size())
-        kernel = kernel.reshape(size[0] * size[2] * size[3], 1, 1, 10, 10)
-        x = torch.unsqueeze(x, 0)
-        x = F.conv3d(input=x, weight=kernel, bias=None, stride=1, padding=0, dilation=(1, 3, 3), groups=size[0])
-        # print(torch.cuda.memory_allocated() / 1024 / 1024)
-        x = torch.reshape(x, (size[0], size[1], size[2], size[3]))
+        x = F.unfold(x, [10, 10], dilation=[3, 3])
+        x = x.reshape(size[0], size[1], 10 * 10)
+        kernel = kernel.reshape(size[0], 100, -1)
+        x = torch.matmul(x, kernel)
+        x = x.reshape(size[0], size[1], size[2], size[3])
+
+        # for attention visualization
+
         # print(torch.cuda.memory_allocated() / 1024 / 1024)
         attention = kernel.data
         attention = attention.requires_grad_(False)
@@ -205,36 +209,28 @@ class PicanetL(nn.Module):
         kernel = self.conv1(x)
         kernel = self.conv2(kernel)
         kernel = F.softmax(kernel, 1)
-        kernel = torch.reshape(kernel, (size[0] * size[2] * size[3], 1, 1, 7, 7))
-        # fmap = []
-        # x = torch.unsqueeze(x, 0)
-        x = F.pad(x, (6, 6, 6, 6))
-        # print(torch.cuda.memory_allocated() / 1024 / 1024)
-        patch = x.unfold(2, 13, 1).unfold(3, 13, 1).contiguous().view(1, -1, size[1], 13, 13)
-        # print(torch.cuda.memory_allocated() / 1024 / 1024)
-        x = F.conv3d(input=patch, weight=kernel, bias=None, stride=1, padding=0, dilation=(1, 2, 2),
-                     groups=size[0] * size[2] * size[3])
-        x = x.view(size[0], size[1], size[2], size[3])
-        """
-        for i in range(size[2]):
-            for j in range(size[3]):
-                print(torch.cuda.memory_allocated() / 1024 / 1024)
-                pix = F.conv3d(input=F.pad(x, (6 - j, 7 + j - size[3], 6 - i, 7 + i - size[2])),
-                               weight=kernel[:, :, :, :, :, i, j],
-                               dilation=(1, 2, 2), groups=size[0])
-                print(torch.cuda.memory_allocated() / 1024 / 1024)
-                fmap.append(pix)
-        x = torch.cat(fmap, 3)
-        x = torch.reshape(x, (size[0], size[1], size[2], size[3]))
-        """
         attention = kernel.data
+        kernel = kernel.reshape(size[0], 1, size[2] * size[3], 7 * 7)
+        # print("Before unfold", x.shape)
+        x = F.unfold(x, kernel_size=[7, 7], dilation=[2, 2], padding=6)
+        # print("After unfold", x.shape)
+        x = x.reshape(size[0], size[1], size[2] * size[3], -1)
+        # print(x.shape, kernel.shape)
+        x = torch.mul(x, kernel)
+        x = torch.sum(x, dim=3)
+        x = x.reshape(size[0], size[1], size[2], size[3])
+
+        # attention = kernel.data
         attention = attention.requires_grad_(False)
+        # attention = torch.reshape(attention, (size[0], -1, 7, 7))
         attention = torch.reshape(attention, (size[0], -1, 7, 7))
         # attention = F.conv_transpose2d(torch.ones((1, 1, 1, 1)).cuda(), attention, dilation=2)
         attention = F.upsample(attention, int(12 * 224 / size[2] + 1), mode='bilinear', align_corners=True)
         # attention = F.interpolate(attention, int(12 * 224 / size[2] + 1), mode='area')
         attention = torch.reshape(attention,
                                   (size[0], size[2], size[3], int(12 * 224 / size[2] + 1), int(12 * 224 / size[2] + 1)))
+        # attention = attention.permute(0, 2, 1, 3, 4)
+        # attention = attention.permute(0, 1, 2, 4, 3)
         return x, attention
 
 
