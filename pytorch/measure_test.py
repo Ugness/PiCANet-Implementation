@@ -14,18 +14,18 @@ from sklearn.metrics import precision_recall_curve
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
 
-    models = sorted(os.listdir('models/state_dict/09102252'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
+    models = sorted(os.listdir('models/state_dict/10151622'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
     duts_dataset = DUTSdataset(root_dir='../DUTS-TE', train=False)
-    dataloader = DataLoader(duts_dataset, 4, shuffle=True)
+    dataloader = DataLoader(duts_dataset, 8, shuffle=True)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/F_Measure/09102252_adjusted')
+    writer = SummaryWriter('log/F_Measure/10151622_adjusted')
     model = Unet().to(device)
     for model_name in models:
         if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
             continue
 
-        state_dict = torch.load('models/state_dict/09102252/' + model_name)
+        state_dict = torch.load('models/state_dict/10151622/' + model_name)
         model.load_state_dict(state_dict)
         model.eval()
         mae = 0
@@ -41,19 +41,22 @@ if __name__ == '__main__':
             pred = pred.requires_grad_(False)
             preds.append(pred)
             masks.append(mask)
-        pred = torch.stack(preds, 0).cpu()
-        mask = torch.stack(masks, 0).cpu()
+        pred = torch.cat(preds, 0)
+        mask = torch.cat(masks, 0)
         writer.add_pr_curve('PR_curve', mask, pred, global_step=int(model_name.split('epo_')[1].split('step')[0]))
         writer.add_scalar('MAE', torch.mean(torch.abs(pred - mask)), global_step=int(model_name.split('epo_')[1].split('step')[0]))
         # Measure method from https://github.com/AceCoooool/DSS-pytorch solver.py
+        pred = pred.cpu()
+        mask = mask.round().float().cpu()
         prec, recall = torch.zeros(256), torch.zeros(256)
         thlist = torch.linspace(0, 1 - 1e-10, 256)
         for i in range(256):
             y_temp = (pred >= thlist[i]).float()
             tp = (y_temp * mask).sum()
-            prec[i], recall[i] = tp / (y_temp.sum() + 1e-20), tp / mask.sum()
-
+            # avoid prec becomes 0
+            prec[i], recall[i] = (tp + 1e-10) / (y_temp.sum() + 1e-10), (tp + 1e-10) / (mask.sum() + 1e-10)
         f_score = (1 + beta_square) * prec * recall / (beta_square * prec + recall)
+        print(torch.max(f_score))
         writer.add_scalar("Max F_score", torch.max(f_score), global_step=int(model_name.split('epo_')[1].split('step')[0]))
         writer.add_scalar("Max_F_threshold", thlist[torch.argmax(f_score)], global_step=int(model_name.split('epo_')[1].split('step')[0]))
         print(model_name.split('epo_')[1].split('step')[0])
