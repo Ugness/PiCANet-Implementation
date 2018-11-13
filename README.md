@@ -144,7 +144,7 @@ Assume you test the model with
 * Pretrained model dir: Pytorch/models/state_dict/07261950/10epo_1000000step.ckpt  
 * CPU mode  
 <code>
-    python Image_test.py --model_dir models/state_dict/07261950/10epo_1000000step.ckpt --img test --cuda cpu
+    python Image_test.py --model_dir models/state_dict/07261950/10epo_1000000step.ckpt --image_dir test --cuda cpu
 </code>
 
 ### Directory & Name Format of .ckpt files
