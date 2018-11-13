@@ -104,7 +104,7 @@ You can run code by add images and download models from [google drive](https://d
     python Image_Test.py -h
 </code>
 <pre>
-    usage: Image_Test.py [-h] [--model_dir MODEL_DIR] [-img IMAGE_DIR]
+    usage: Image_Test.py [-h] [--model_dir MODEL_DIR] [-img --image_dir IMAGE_DIR]
                          [--cuda CUDA] [--batch_size BATCH_SIZE]
 
     optional arguments:
@@ -142,7 +142,7 @@ Assume you test the model with
 * current dir: Pytorch/  
 * Testset dir: Pytorch/test  
 * Pretrained model dir: Pytorch/models/state_dict/07261950/10epo_1000000step.ckpt  
-* CPU mode  
+* CPU mode
 <code>
     python Image_test.py --model_dir models/state_dict/07261950/10epo_1000000step.ckpt --image_dir test --cuda cpu
 </code>
