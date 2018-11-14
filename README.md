@@ -14,8 +14,6 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 * batchsize 4
 ![training_result](readme_images/Training_result_new.JPG)  
 
-![graph](readme_images/graph.png)
-
 
 
 # PPT(Korean)
@@ -24,19 +22,8 @@ https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 
 # Top 10 Performance Test with F-score (beta-square = 0.3)
 batchsize:4
-
-| Step   | Value    |
-|--------|----------|
-| 100000 | 0.865094 |
-| 131000 | 0.866099 |
-| 214000 | 0.865814 |
-| 259000 | 0.866556 |
-| 275000 | 0.868446 |
-| 281000 | 0.869376 |
-| **383000** | **0.870971** |
-| 392000 | 0.865107 |
-| 399000 | 0.866888 |
-| 410000 | 0.866439 |
+The results with wrong measurement.
+Will be updated soon with correct measurement.
 
 
 # Execution Guideline
