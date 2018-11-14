@@ -22,7 +22,8 @@ https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 
 # Top 10 Performance Test with F-score (beta-square = 0.3)
 batchsize:4
-The results with wrong measurement.
+The results with wrong measurement.  
+* [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9)  
 Will be updated soon with correct measurement.
 
 
