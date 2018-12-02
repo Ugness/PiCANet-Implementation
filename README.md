@@ -24,8 +24,9 @@ https://www.slideshare.net/JaehoonYoo5/picanet-pytorch-implementation-korean
 batchsize:4
 The results with wrong measurement.  
 * [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9)  
-Will be updated soon with correct measurement (still may not correct)
-(Using pytorch/measure_test.py)
+Will be updated soon with correct measurement (still may not correct)  
+(Using pytorch/measure_test.py)  
+
 | Step    | Value   | Threshold | MAE     |
 |---------|---------|-----------|---------|
 | 214000  | 0.8520  | 0.6980    | 0.0504  |
