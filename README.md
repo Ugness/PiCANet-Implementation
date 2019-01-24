@@ -1,12 +1,6 @@
 # PiCANet-Implementation
 Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention for Saliency Detection**](https://arxiv.org/abs/1708.06433)
 
-
-## New method on implementing PiCANet
-* [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9)
-* Conv3d version is deleted.
-
-
 ![input image](readme_images/input.png)
 ![target_image](readme_images/mask.png)
 * batchsize 1
