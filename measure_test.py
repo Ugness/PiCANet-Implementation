@@ -13,7 +13,7 @@ from sklearn.metrics import precision_recall_curve
 
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
-
+    # TODO: Add argparse and Refactor the code for sharing
     models = sorted(os.listdir('models/state_dict/10151622'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
     duts_dataset = DUTSdataset(root_dir='../DUTS-TE', train=False)
     dataloader = DataLoader(duts_dataset, 8, shuffle=True)

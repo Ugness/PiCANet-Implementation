@@ -1,4 +1,3 @@
-import sys
 import datetime
 import os
 from itertools import islice
@@ -9,16 +8,10 @@ import torch
 from torch.utils.data import DataLoader
 import torchvision
 from tensorboardX import SummaryWriter
-
-sys.path.append('./pytorch')
+from tqdm import tqdm
 
 from network import Unet
 from dataset import DUTSDataset, PairDataset
-
-cfg = {'PicaNet': "GGLLL",
-       'Size': [28, 28, 28, 56, 112, 224],
-       'Channel': [1024, 512, 512, 256, 128, 64],
-       'loss_ratio': [0.5, 0.5, 0.5, 0.8, 0.8, 1]}
 
 cfg = {'PicaNet': "GGLLL",
        'Size': [28, 28, 28, 56, 112, 224],
