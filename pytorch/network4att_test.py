@@ -141,7 +141,7 @@ class DecoderCell(nn.Module):
             dec = input[1]
 
         if dec.size()[2] * 2 == en.size()[2]:
-            dec = F.upsample(dec, scale_factor=2, mode='bilinear', align_corners=True)
+            dec = F.interpolate(dec, scale_factor=2, mode='bilinear', align_corners=True)
         elif dec.size()[2] != en.size()[2]:
             assert 0
         en = self.bn_en(en)
@@ -157,10 +157,10 @@ class DecoderCell(nn.Module):
             x = self.bn_feature(x)
             dec_out = F.relu(x)
             _y = self.conv3(dec_out)
-            _y = F.sigmoid(_y)
+            _y = torch.sigmoid(_y)
         else:
             dec_out = self.conv2(fmap)
-            _y = F.sigmoid(dec_out)
+            _y = torch.sigmoid(dec_out)
             attention = None
 
         return dec_out, _y, attention
@@ -191,7 +191,7 @@ class PicanetG(nn.Module):
         attention = attention.requires_grad_(False)
         attention = torch.reshape(attention, (size[0], -1, 10, 10))
         # attention = F.conv_transpose2d(torch.ones((1, 1, 1, 1)).cuda(), attention, dilation=3)
-        attention = F.upsample(attention, 224, mode='bilinear', align_corners=True)
+        attention = F.interpolate(attention, 224, mode='bilinear', align_corners=True)
         # attention = F.interpolate(attention, 224, mode='area')
         attention = torch.reshape(attention, (size[0], size[2], size[3], 224, 224))
         return x, attention
@@ -225,7 +225,7 @@ class PicanetL(nn.Module):
         # attention = torch.reshape(attention, (size[0], -1, 7, 7))
         attention = torch.reshape(attention, (size[0], -1, 7, 7))
         # attention = F.conv_transpose2d(torch.ones((1, 1, 1, 1)).cuda(), attention, dilation=2)
-        attention = F.upsample(attention, int(12 * 224 / size[2] + 1), mode='bilinear', align_corners=True)
+        attention = F.interpolate(attention, int(12 * 224 / size[2] + 1), mode='bilinear', align_corners=True)
         # attention = F.interpolate(attention, int(12 * 224 / size[2] + 1), mode='area')
         attention = torch.reshape(attention,
                                   (size[0], size[2], size[3], int(12 * 224 / size[2] + 1), int(12 * 224 / size[2] + 1)))

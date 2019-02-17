@@ -59,7 +59,7 @@ class ToTensor(object):
         return {'image': img, 'mask': mask}
 
 
-class DUTSdataset(data.Dataset):
+class DUTSDataset(data.Dataset):
     def __init__(self, root_dir, train=True, data_augmentation=True):
         self.root_dir = root_dir
         self.train = train
@@ -110,7 +110,38 @@ class DUTSdataset(data.Dataset):
         mask = mask.convert('L')
         sample = {'image': img, 'mask': mask}
 
-        # if self.data_augmentation:
+        sample = self.transform(sample)
+        return sample
+
+
+class PairDataset(data.Dataset):
+    def __init__(self, root_dir, train=True, data_augmentation=True):
+        self.root_dir = root_dir
+        self.train = train
+        self.image_list = os.listdir(os.path.join(root_dir, 'images'))
+        self.mask_list = os.listdir(os.path.join(root_dir, 'masks'))
+        self.transform = transforms.Compose(
+            [RandomFlip(0.5),
+             RandomCrop(224),
+             ToTensor()])
+        if not (train and data_augmentation):
+            self.transform = transforms.Compose([Resize(224), ToTensor()])
+        self.root_dir = root_dir
+        self.train = train
+        self.data_augmentation = data_augmentation
+
+    def __len__(self):
+        return len(self.image_list)
+
+    def __getitem__(self, item):
+        img_name = os.path.join(self.root_dir, 'images', self.image_list[item])
+        mask_name = os.path.join(self.root_dir, 'masks', self.mask_list[item])
+        img = Image.open(img_name)
+        mask = Image.open(mask_name)
+        img = img.convert('RGB')
+        mask = mask.convert('L')
+        sample = {'image': img, 'mask': mask}
+
         sample = self.transform(sample)
         return sample
 
@@ -133,11 +164,5 @@ class CustomDataset(data.Dataset):
 
 
 if __name__ == '__main__':
-    # os.chdir('..')
-    # print(os.getcwd())
-    ds = DUTSdataset('../DUTS-TR')
-    # pil = transforms.ToPILImage()
-    # out = ds[0]
-    # pil(out['image']).show()
-    # pil(out['mask']).show()
+    ds = DUTSDataset('../DUTS-TR')
     ds.arrange()

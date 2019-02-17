@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     models = sorted(os.listdir('models/state_dict/10151622'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
     duts_dataset = DUTSdataset(root_dir='../DUTS-TE', train=False)
-    dataloader = DataLoader(duts_dataset, 4, shuffle=True)
+    dataloader = DataLoader(duts_dataset, 8, shuffle=True)
     beta_square = 0.3
     device = torch.device("cuda")
     writer = SummaryWriter('log/F_Measure/10151622_20181119')
@@ -24,8 +24,8 @@ if __name__ == '__main__':
     for model_name in models:
         if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
             continue
-        # if int(model_name.split('epo_')[1].split('step')[0]) != 383000:
-        #     continue
+        if int(model_name.split('epo_')[1].split('step')[0]) < 325000:
+            continue
         state_dict = torch.load('models/state_dict/10151622/' + model_name)
         model.load_state_dict(state_dict)
         model.eval()

@@ -137,7 +137,7 @@ class DecoderCell(nn.Module):
             dec = input[1]
 
         if dec.size()[2] * 2 == en.size()[2]:
-            dec = F.upsample(dec, scale_factor=2, mode='bilinear', align_corners=True)
+            dec = F.interpolate(dec, scale_factor=2, mode='bilinear', align_corners=True)
         elif dec.size()[2] != en.size()[2]:
             assert 0
         en = self.bn_en(en)
@@ -146,17 +146,16 @@ class DecoderCell(nn.Module):
         fmap = self.conv1(fmap)
         fmap = F.relu(fmap)
         if not self.mode == 'C':
-            # print(fmap.size())
             fmap_att = self.picanet(fmap)  # F_att
             x = torch.cat((fmap, fmap_att), 1)
             x = self.conv2(x)
             x = self.bn_feature(x)
             dec_out = F.relu(x)
             _y = self.conv3(dec_out)
-            _y = F.sigmoid(_y)
+            _y = torch.sigmoid(_y)
         else:
             dec_out = self.conv2(fmap)
-            _y = F.sigmoid(dec_out)
+            _y = torch.sigmoid(dec_out)
 
         return dec_out, _y
 
@@ -172,16 +171,10 @@ class PicanetG(nn.Module):
         size = x.size()
         kernel = self.renet(x)
         kernel = F.softmax(kernel, 1)
-        # x = x.reshape(size[0], size[1], size[2] * size[3])
-        # kernel = kernel.reshape(size[0] * size[2] * size[3], 1, 1, 10, 10)
-        # kernel = kernel.reshape(size[0], size[1]*size[2]*size[3], 1)
         x = F.unfold(x, [10, 10], dilation=[3, 3])
         x = x.reshape(size[0], size[1], 10 * 10)
         kernel = kernel.reshape(size[0], 100, -1)
-        # print(x.shape)
-        # print(kernel.shape)
         x = torch.matmul(x, kernel)
-        # print(x.shape)
         x = x.reshape(size[0], size[1], size[2], size[3])
         return x
 
@@ -207,7 +200,6 @@ class PicanetL(nn.Module):
         x = torch.mul(x, kernel)
         x = torch.sum(x, dim=3)
         x = x.reshape(size[0], size[1], size[2], size[3])
-        # print(x.shape)
         return x
 
 
@@ -222,12 +214,10 @@ class Renet(nn.Module):
         self.horizontal = nn.LSTM(input_size=512, hidden_size=256, batch_first=True,
                                   bidirectional=True)  # each column
         self.conv = nn.Conv2d(512, out_channel, 1)
-        # self.fc = nn.Linear(512 * size * size, 10)
 
     def forward(self, *input):
         x = input[0]
         temp = []
-        # size = x.size()  # batch, in_channel, height, width
         x = torch.transpose(x, 1, 3)  # batch, width, height, in_channel
         for i in range(self.size):
             h, _ = self.vertical(x[:, :, i, :])
@@ -239,44 +229,22 @@ class Renet(nn.Module):
             temp.append(h)  # batch, width, 512
         x = torch.stack(temp, dim=3)  # batch, height, 512, width
         x = torch.transpose(x, 1, 2)  # batch, 512, height, width
-        # x = torch.reshape(x, (-1, 512 * self.size * self.size))
         x = self.conv(x)
         return x
 
 
 if __name__ == '__main__':
     vgg = torchvision.models.vgg16(pretrained=True)
-    # model = Encoder()
-    # model.seq.load_state_dict(vgg.features.state_dict())
-    # print(model.state_dict().keys())
-    # print(vgg.features.state_dict().keys())
-    # print(vgg.features)
+
     device = torch.device("cuda")
     batch_size = 1
     noise = torch.randn((batch_size, 3, 224, 224)).type(torch.cuda.FloatTensor)
     target = torch.randn((batch_size, 1, 224, 224)).type(torch.cuda.FloatTensor)
 
-    # print(vgg.features(noise))
-    # print(model(noise))
-    # print(model.seq)
-    # print(vgg.features)
-    # print(F.mse_loss(model.seq[:8](noise), vgg.features[:8](noise)))
     model = Unet(cfg).cuda()
     model.encoder.seq.load_state_dict(vgg.features.state_dict())
     opt = torch.optim.Adam(model.parameters(), lr=0.001)
     print('Time: {}'.format(time.clock()))
     _, loss = model(noise, target)
     loss.backward()
-    """
-    for i in range(1000):
-        opt.zero_grad()
-        time_spend = time.clock()
-        _, loss = model(noise, target)
-        print('Time_Spend: {}'.format(time.clock() - time_spend))
-        loss.backward()
-        opt.step()
-
-        print(float(loss))
-        print('Time: {}'.format(time.clock()))
-    """
 

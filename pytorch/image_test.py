@@ -19,6 +19,9 @@ if __name__ == '__main__':
     parser.add_argument('--cuda', help="cuda for cuda, cpu for cpu, default = cuda", default='cuda')
     parser.add_argument('--batch_size', help="batchsize, default = 4", default=4, type=int)
     parser.add_argument('--logdir', help="logdir, default = log/Image_test", default='log/Image_test')
+    # TODO: Add Image Save application on image_test.py and Delete image_test_file_output.py
+    parser.add_argument('--save_dir', help="save result images as .jpg file. If None -> Not save", default=None)
+
     args = parser.parse_args()
 
     print(args)
