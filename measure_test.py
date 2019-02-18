@@ -1,32 +1,48 @@
-# from sklearn.metrics import precision_recall_fscore_support
 from network import Unet
-from dataset import DUTSdataset
+from dataset import PairDataset
 import torch
 import os
-import torch.nn.functional as F
-import numpy as np
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
 
 import argparse
-from sklearn.metrics import precision_recall_curve
+from tqdm import tqdm
 
 torch.set_printoptions(profile='full')
 if __name__ == '__main__':
-    # TODO: Add argparse and Refactor the code for sharing
-    models = sorted(os.listdir('models/state_dict/10151622'), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
-    duts_dataset = DUTSdataset(root_dir='../DUTS-TE', train=False)
-    dataloader = DataLoader(duts_dataset, 8, shuffle=True)
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    print("Default path : " + os.getcwd())
+    parser.add_argument("--model_dir", required=True,
+                        help="Directory of folder which contains pre-trained models, you can download at \n"
+                             "https://drive.google.com/drive/folders/1s4M-_SnCPMj_2rsMkSy3pLnLQcgRakAe?usp=sharing")
+    parser.add_argument('--dataset', help='Directory of your test_image ""folder""', required=True)
+    parser.add_argument('--cuda', help="cuda for cuda, cpu for cpu, default = cuda", default='cuda')
+    parser.add_argument('--batch_size', help="batchsize, default = 4", default=4, type=int)
+    parser.add_argument('--logdir', help="logdir, log on tensorboard", default=None)
+    parser.add_argument('--which_iter', help="Specific Iter to measure", default=-1, type=int)
+    parser.add_argument('--cont', help="Measure scores from this iter", default=0, type=int)
+    parser.add_argument('--step', help="Measure scores per this iter step", default=10000, type=int)
+
+    args = parser.parse_args()
+
+    models = sorted(os.listdir(args.model_dir), key=lambda x: int(x.split('epo_')[1].split('step')[0]))
+    pairdataset = PairDataset(root_dir=args.dataset, train=False, data_augmentation=False)
+    dataloader = DataLoader(pairdataset, 8, shuffle=True)
     beta_square = 0.3
     device = torch.device("cuda")
-    writer = SummaryWriter('log/F_Measure/10151622_20181119')
+    if args.logdir is not None:
+        writer = SummaryWriter(args.logdir)
     model = Unet().to(device)
     for model_name in models:
-        if int(model_name.split('epo_')[1].split('step')[0]) % 1000 != 0:
+        model_iter = int(model_name.split('epo_')[1].split('step')[0])
+        if model_iter % args.step != 0:
             continue
-        if int(model_name.split('epo_')[1].split('step')[0]) < 325000:
+        if model_iter < args.cont:
             continue
-        state_dict = torch.load('models/state_dict/10151622/' + model_name)
+        if args.which_iter > 0 and args.which_iter != model_iter:
+            continue
+        state_dict = torch.load(os.path.join(args.model_dir, model_name))
         model.load_state_dict(state_dict)
         model.eval()
         mae = 0
@@ -34,6 +50,8 @@ if __name__ == '__main__':
         masks = []
         precs = []
         recalls = []
+        print('==============================')
+        print("On iteration : " + str(model_iter))
         for i, batch in enumerate(dataloader):
             img = batch['image'].to(device)
             mask = batch['mask'].to(device)
@@ -42,8 +60,8 @@ if __name__ == '__main__':
             pred = pred[5].data
             mae += torch.mean(torch.abs(pred - mask))
             pred = pred.requires_grad_(False)
-            preds.append(pred)
-            masks.append(mask)
+            preds.append(pred.cpu())
+            masks.append(mask.cpu())
             prec, recall = torch.zeros(mask.shape[0], 256), torch.zeros(mask.shape[0], 256)
             pred = pred.squeeze(dim=1).cpu()
             mask = mask.squeeze(dim=1).cpu()
@@ -61,15 +79,17 @@ if __name__ == '__main__':
         recall = torch.cat(recalls, dim=0).mean(dim=0)
         f_score = (1 + beta_square) * prec * recall / (beta_square * prec + recall)
         thlist = torch.linspace(0, 1 - 1e-10, 256)
-        writer.add_scalar("Max F_score", torch.max(f_score),
-                          global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar("Max_F_threshold", thlist[torch.argmax(f_score)],
-                          global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        print("Max F_score :", torch.max(f_score))
+        print("Max_F_threshold :", thlist[torch.argmax(f_score)])
+        if args.logdir is not None:
+            writer.add_scalar("Max F_score", torch.max(f_score),
+                              global_step=model_iter)
+            writer.add_scalar("Max_F_threshold", thlist[torch.argmax(f_score)],
+                              global_step=model_iter)
         pred = torch.cat(preds, 0)
         mask = torch.cat(masks, 0).round().float()
-        writer.add_pr_curve('PR_curve', mask, pred, global_step=int(model_name.split('epo_')[1].split('step')[0]))
-        writer.add_scalar('MAE', torch.mean(torch.abs(pred - mask)), global_step=int(model_name.split('epo_')[1].split('step')[0]))
+        if args.logdir is not None:
+            writer.add_pr_curve('PR_curve', mask, pred, global_step=model_iter)
+            writer.add_scalar('MAE', torch.mean(torch.abs(pred - mask)), global_step=model_iter)
+        print("MAE :", torch.mean(torch.abs(pred-mask)))
         # Measure method from https://github.com/AceCoooool/DSS-pytorch solver.py
-        pred = pred.cpu()
-        mask = mask.cpu()
-        print(model_name.split('epo_')[1].split('step')[0])

@@ -59,7 +59,6 @@ if __name__ == '__main__':
     if load is not None:
         state_dict = torch.load(load, map_location=args.cuda)
 
-        # TODO: Extract name splitter and OS Dependency.
         start_iter = int(load.split('epo_')[1].strip('step.ckpt')) + 1
         start_epo = int(load.split('/')[3].split('epo')[0])
         now = datetime.datetime.strptime(load.split('/')[2], '%m%d%H%M')

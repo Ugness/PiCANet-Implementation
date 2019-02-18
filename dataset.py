@@ -127,7 +127,6 @@ class PairDataset(data.Dataset):
         if not (train and data_augmentation):
             self.transform = transforms.Compose([Resize(224), ToTensor()])
         self.root_dir = root_dir
-        self.train = train
         self.data_augmentation = data_augmentation
 
     def __len__(self):
