@@ -118,8 +118,8 @@ class PairDataset(data.Dataset):
     def __init__(self, root_dir, train=True, data_augmentation=True):
         self.root_dir = root_dir
         self.train = train
-        self.image_list = os.listdir(os.path.join(root_dir, 'images'))
-        self.mask_list = os.listdir(os.path.join(root_dir, 'masks'))
+        self.image_list = sorted(os.listdir(os.path.join(root_dir, 'images')))
+        self.mask_list = sorted(os.listdir(os.path.join(root_dir, 'masks')))
         self.transform = transforms.Compose(
             [RandomFlip(0.5),
              RandomCrop(224),
