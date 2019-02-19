@@ -13,6 +13,24 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 * batchsize 4
 ![training_result](readme_images/Training_result_new.JPG)  
 
+# Top 10 Performance Test with F-score (beta-square = 0.3)
+batchsize:4
+* [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9) 
+
+| Step    | Value   | Threshold | MAE     |
+|---------|---------|-----------|---------|
+| 214000  | 0.8520  | 0.6980    | 0.0504  |
+| 259000  | 0.8518  | 0.6510    | 0.0512  |
+| 275000  | 0.8533  | 0.6627    | 0.0536  |
+| 281000  | 0.8540  | 0.7451    | 0.0515  |
+| 307000  | 0.8518  | 0.8078    | 0.0523  |
+| 383000  | 0.8546  | 0.6627    | 0.0532  |
+| 399000  | 0.8561  | 0.7882    | 0.0523  |
+| 400000  | 0.8544  | 0.7804    | 0.0512  |
+| 408000  | 0.8535  | 0.5922    | 0.0550  |
+| 410000  | 0.8518  | 0.7882    | 0.0507  |
+
+
 # Execution Guideline
 ## Requirements
 Pillow==4.3.0  
