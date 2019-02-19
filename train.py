@@ -1,6 +1,5 @@
 import datetime
 import os
-from itertools import islice
 import numpy as np
 import argparse
 
@@ -29,7 +28,8 @@ if __name__ == '__main__':
                              "https://drive.google.com/file/d/109a0hLftRZ5at5hwpteRfO1A6xLzf8Na/view?usp=sharing\n"
                              "None --> Do not use pre-trained model. Training will start from random initialized model")
     parser.add_argument('--dataset', help='Directory of your Dataset', required=True, default=None)
-    parser.add_argument('--cuda', help="'cuda' for cuda, 'cpu' for cpu, default = cuda", default='cuda')
+    parser.add_argument('--cuda', help="'cuda' for cuda, 'cpu' for cpu, default = cuda",
+                        default='cuda', choices=['cuda', 'cpu'])
     parser.add_argument('--batch_size', help="batchsize, default = 1", default=1, type=int)
     parser.add_argument('--epoch', help='# of epochs. default = 20', default=20, type=int)
     parser.add_argument('-lr', '--learning_rate', help='learning_rate. default = 0.001', default=0.001, type=float)
@@ -89,8 +89,10 @@ if __name__ == '__main__':
     writer = SummaryWriter(os.path.join('log', now.strftime('%m%d%H%M')))
     iterate = start_iter
     for epo in range(start_epo, epoch):
-        print("Epoch : {}".format(epo))
-        for i, batch in enumerate(tqdm(islice(dataloader, start_iter, None))):
+        print("\nEpoch : {}".format(epo))
+        for i, batch in enumerate(tqdm(dataloader)):
+            if i > 10:
+                break
             opt_dec.zero_grad()
             opt_en.zero_grad()
             img = batch['image'].to(device)
