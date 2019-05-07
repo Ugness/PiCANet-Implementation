@@ -13,7 +13,7 @@ Pytorch Implementation of [**PiCANet: Learning Pixel-wise Contextual Attention f
 * batchsize 4
 ![training_result](readme_images/Training_result_new.JPG)  
 
-# Top 10 Performance Test with F-score (beta-square = 0.3)
+# (DUTS) Top 10 Performance Test with F-score (beta-square = 0.3)
 batchsize:4
 * [Issue#9](https://github.com/Ugness/PiCANet-Implementation/issues/9) 
 
