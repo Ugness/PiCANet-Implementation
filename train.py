@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 for file in weight_save_dir:
                     if '00' in file and '000' not in file:
                         os.remove(os.path.join(weight_save_dir, file))
-            if i + epo * len(dataloader) % decay_step == 0 and i != 0:
+            if (i + epo * len(dataloader)) % decay_step == 0 and i != 0:
                 learning_rate *= lr_decay
                 opt_en = torch.optim.SGD(model.encoder.parameters(), lr=learning_rate, momentum=0.9,
                                          weight_decay=0.0005)
